@@ -1,82 +1,91 @@
 # P000 — Història Conversacional: "L'Excursió del Puig de les Bruixes"
 
-Adaptació d'una aventura conversacional clàssica a **aventura gràfica clicable** (estil point-and-click), implementada en **Java** amb bon ús de la programació orientada a objectes.
-
-📄 Disseny complet de la història i el mapa: [`Nova_Historia.md`](./Nova_Historia.md)
+Aventura conversacional en **Java** amb **interfície gràfica i imatges**, feta per al mòdul
+**MP13 (Mòdul DUAL)** del CFGS de Desenvolupament d'Aplicacions Multiplataforma.
 
 ---
 
-## 1. Què és aquest projecte
+## Documentació
 
-En comptes d'escriure ordres per teclat ("ANAR NORD", "AGAFAR CLAU"), el jugador interactua **clicant botons i zones sobre imatges**: fletxes per moure's entre sales, icones sobre els objectes, un botó de diàleg quan hi ha un personatge. Per sota, la lògica del joc segueix funcionant amb els mateixos verbs/accions que demana l'enunciat original (ANAR, AGAFAR, DEIXAR, USAR, OBRIR, TANCAR, ENCENDRE, APAGAR, PARLAR) — només canvia com el jugador els dispara.
+| Document | Contingut |
+|---|---|
+| 📄 [Enunciat original](./docs/enunciat/P000-enunciat.pdf) | PDF del professorat |
+| 📖 [Disseny de la història](./docs/historia.md) | Mapa de zones, objectes, personatges, finals i regles |
+| ✅ [Verificació de requisits](./docs/verificacio-requisits.md) | Contrast punt per punt amb l'enunciat |
+| 📐 [Diagrama de classes](./docs/diagrames/) | **Entrega 1** — fitxer draw.io + explicació |
 
-Les imatges de zones, objectes i personatges es generaran amb **Higgsfield AI / Grok**, amb un estil visual consistent.
+## Com és el joc
 
-## 2. Resum de la història
+Durant una excursió d'institut al **Puig de les Bruixes**, el protagonista es despista del grup fent
+una foto i queda atrapat en una boira estranya. Ha de trobar el camí de tornada al **Camp Base**
+abans que el bus marxi a les 18h, travessant bosc, riu, cascada, cova, pont penjant, cim i una ermita
+on viu en **Tomeu** — que no és tan sols un ermità qualsevol. Pel camí hi ha un **senglar** que
+patrulla les coves i que només es pot esquivar distraient-lo amb una poma.
 
-Durant una excursió d'institut al **Puig de les Bruixes**, el protagonista es despista del grup fent una foto i queda atrapat en una boira estranya. Ha de trobar el camí de tornada al **Camp Base** abans que el bus marxi, travessant bosc, riu, cascada, cova, pont penjant, cim i una ermita on viu en **Tomeu** — que no és tan sols un ermità qualsevol.
+Cada zona es veu amb una **il·lustració** i el jugador hi actua de dues maneres equivalents:
+**escrivint l'ordre** (`ANAR NORD`, `USAR LLANTERNA`…) o **clicant els botons de verbs**, que generen
+exactament la mateixa cadena de text i passen pel mateix analitzador. Així el joc «entén els texts»
+que demana l'enunciat i alhora és còmode de jugar.
 
-Detalls complets (mapa de 10 zones, connexions, objectes, personatge, antagonista, finals) al document de disseny enllaçat a dalt.
+### Extres per sobre dels mínims
 
-### Elements afegits sobre els mínims
-- 🌗 **Cicle de llum**: cada zona canvia d'imatge (dia/capvespre/nit) segons avança el rellotge intern → pressió visual del temps.
-- 📷 **Càmera + àlbum de fotos**: mini-col·leccionable opcional que anima a explorar totes les zones i rejugar.
-- 🎭 **Gir narratiu d'en Tomeu**: es revela com el guardià de la llegenda del Puig.
-- 🔁 **Dejà vu** en morir (senglar) en comptes d'un game over sec.
-- 🌟 **Final secret** si es fan totes dues ofrenes a en Tomeu.
-- 🌲 Petits senyals ambientals (marques, cercles de pedres...) que reforcen el misteri sense afegir lògica.
+- 🌗 **Cicle de llum** — cada zona té 3 imatges (dia / capvespre / nit) segons el rellotge intern.
+- 📷 **Càmera i àlbum de fotos** — col·leccionable de 8 moments que es mostra a l'epíleg.
+- 🎭 **Gir narratiu d'en Tomeu** — es revela com el guardià de la llegenda del Puig.
+- 🔁 **Dejà vu** en morir, en comptes d'un *game over* sec.
+- 🌟 **Final secret** si li fas totes dues ofrenes a en Tomeu.
 
-Cap d'aquests extres substitueix cap requisit obligatori de l'enunciat; són capes de polish per sobre.
-
-## 3. Checklist de requisits mínims de l'enunciat
+## Requisits mínims de l'enunciat
 
 - [x] 10 zones diferents amb descripció en entrar-hi
-- [x] No totes les zones amb les mateixes sortides/entrades
-- [x] Mínim 2 accions per zona (a més de canviar de zona)
+- [x] Sortides no uniformes (d'1 a 4 segons la zona, tres d'elles condicionades)
+- [x] Mínim 2 accions per zona a més de canviar de zona
 - [x] Inventari: agafar objectes d'una zona i deixar-los a una altra
-- [x] El joc entén (internament, com a accions) ANAR / ENCENDRE / USAR / DEIXAR / APAGAR / PARLAR / AGAFAR / OBRIR / TANCAR
-- [x] Mínim 6 objectes agafables, deixables i usables (en tenim 6 obligatoris + 2 opcionals: bastó i càmera)
-- [x] 1 personatge sense IA real, que reacciona a frases/accions concretes i pot bloquejar una sortida o donar un objecte
-- [x] El joc té final(s) i permet jugar una altra partida
+- [x] El joc entén els texts ANAR / ENCENDRE / USAR / DEIXAR / APAGAR / PARLAR / AGAFAR / OBRIR / TANCAR
+- [x] 6 objectes agafables, deixables i usables (+ mapa i càmera)
+- [x] 1 personatge sense intel·ligència real que bloqueja una sortida **i** dona un objecte (en Tomeu)
+- [x] El joc té finals i permet jugar una altra partida
 
-## 4. Decisions tècniques
+El detall de com es compleix cada punt és a [`docs/verificacio-requisits.md`](./docs/verificacio-requisits.md).
+
+## Decisions tècniques
 
 | Aspecte | Decisió |
 |---|---|
 | Llenguatge | Java |
-| Paradigma | POO amb herència real (no decorativa): `Element` abstracta → `Objecte` / `Personatge`; `Personatge` abstracta → `PersonatgeAliat` / `PersonatgeAntagonista` |
-| Interfície | Gràfica (Swing o JavaFX, a decidir), imatges + botons en comptes de consola/teclat |
-| Imatges | Generades amb Higgsfield AI / Grok |
-| Persistència de partida | No prevista de moment (es pot valorar si sobra temps) |
+| Interfície | Swing amb imatges + camp d'entrada de text i botons de verbs |
+| Paradigma | POO amb herència real: `Element` → `Objecte` / `Contenidor` / `Personatge`; interfícies `Encenible` i `Usable` |
+| Errors | Jerarquia pròpia d'excepcions (`JocException` i derivades) |
+| Imatges | Estil visual consistent per a totes les zones, objectes i personatges, a `src/recursos/img/` |
+| Persistència | No prevista (es valorarà si sobra temps) |
 
-## 5. Estructura de classes (esborrany previ al diagrama UML)
+## Estructura del projecte
 
 ```
-Joc
- ├─ Zona (nom, descripció, imatges per FaseDelDia, connexions, objectes, personatge)
- │   └─ Connexio (destí, etiqueta, condició opcional)
- ├─ Element (abstracta: nom, descripció, imatge)
- │   ├─ Objecte (agafable, usable-amb)
- │   │   └─ Camera (subclasse especial: genera Foto en comptes d'usar-se)
- │   └─ Personatge (abstracta: reaccions a frases)
- │       ├─ PersonatgeAliat      (en Tomeu)
- │       └─ PersonatgeAntagonista (el senglar, es mou sol)
- ├─ Jugador (zona actual, Inventari)
- ├─ Inventari (llista d'Objecte)
- ├─ Album (llista de Foto)
- ├─ Verb (enum: ANAR, AGAFAR, DEIXAR, USAR, OBRIR, TANCAR, ENCENDRE, APAGAR, PARLAR, FER_FOTO)
- └─ Final (tipus + text d'epíleg)
+P000 - Història conversacional/
+├── docs/
+│   ├── enunciat/P000-enunciat.pdf     Enunciat del professorat
+│   ├── historia.md                    Disseny narratiu i mecànic
+│   ├── verificacio-requisits.md       Contrast amb l'enunciat
+│   └── diagrames/
+│       ├── diagrama-classes.drawio    ENTREGA 1 (2 pàgines)
+│       └── README.md                  Explicació del diagrama
+└── src/
+    ├── control/                       Joc, MotorDeJoc, AnalitzadorOrdres, Ordre, Verb
+    ├── model/                         Zona, Element, Objecte, Personatge, Inventari...
+    ├── vista/                         Vista, VistaGrafica, VistaConsola, GestorImatges
+    ├── excepcions/                    JocException i derivades
+    └── recursos/img/                  Il·lustracions de zones, objectes i personatges
 ```
 
-Aquest esquema és la base sobre la qual es farà el **diagrama de classes UML formal** (primera entrega).
+Un paquet Java per carpeta (`package control;`, `package model;`…), sense capes intermèdies.
 
-## 6. Pla de treball
+## Planificació
 
-| Fase | Contingut | Estat |
-|---|---|---|
-| 0 | Definició de la nova història i mapa de zones | ✅ Fet (aquest document + `Nova_Historia.md`) |
-| 1 | Diagrama de classes: classes, atributs, estructures de dades | 🔜 Següent pas |
-| 2 | Moviments bàsics: interfície gràfica, canvi de zona amb botons | Pendent |
-| 3 | Agafar/deixar/usar objectes, inventari, interacció amb en Tomeu i el senglar | Pendent |
-| 4 | Solució final totalment funcional | Pendent |
-| 5 | Presentació a classe | Pendent |
+| Data | Entrega | Estat |
+|---|---|:---:|
+| 20 de setembre | **Diagrama de classes** (20%) | ✅ Fet |
+| 27 de setembre | Moviments per verbs i mostrar el moviment per pantalla (30%) | 🔜 |
+| 4 d'octubre | Agafar, deixar, usar, inventari i interacció amb personatges (30%) | ⏳ |
+| 29 d'octubre | Solució final totalment funcional | ⏳ |
+| Setmana del 5 al 9 d'octubre | Presentació a classe (20%) | ⏳ |
