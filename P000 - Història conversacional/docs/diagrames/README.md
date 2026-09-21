@@ -84,9 +84,9 @@ Les classes estan agrupades en els quatre paquets del projecte, cadascun amb un 
 | Classe | Paper |
 |---|---|
 | `Vista` *(interfície)* | Contracte de presentació, perquè el motor no depengui de Swing. |
-| `VistaGrafica` | Finestra Swing: imatge de la zona, botons de verbs i **camp de text** per escriure ordres. |
+| `VistaGrafica` | Finestra Swing: imatge de la zona, requadre de text, **camp per escriure ordres** i un botó per cada sortida. |
 | `VistaConsola` | Implementació de text pur, útil per provar el motor sense gràfics. |
-| `GestorImatges` | Carrega i cacheja les imatges de `resources/img/`. |
+| `GestorImatges` | Carrega i cacheja les imatges de `src/recursos/img/`. |
 
 ### Paquet `excepcions`
 
@@ -113,7 +113,7 @@ L'enunciat demana explícitament indicar les **estructures de dades tipus arrays
 | `HashMap<String, String>` | `Personatge.respostes`, `Objecte.usosValids` | Taula clau → resposta (el personatge "sense intel·ligència" de l'enunciat) |
 | `String[]` | `Zona.imatges` | **Array de mida fixa (3)**, indexat per `FaseDelDia`: dia / capvespre / nit |
 | `String[]` | `MapaJoc.NOMS_ZONES`, `AnalitzadorOrdres.PARAULES_BUIDES` | Constants de mida fixa |
-| `JButton[]` | `VistaGrafica.botonsVerbs` | Un botó per verb, nombre conegut en compilació |
+| `JButton[]` | `VistaGrafica.botonsVerbs` | Els botons d'accions ràpides (Mirar, Motxilla, Ajuda): nombre fix i conegut en compilació |
 | `enum` | `Verb`, `FaseDelDia`, `EstatPartida` | Conjunts tancats de valors |
 
 ## Relacions representades

@@ -8,28 +8,32 @@
 
 ## 1. Idea general
 
-Aventura conversacional en **Java** amb **interfície gràfica i imatges**. Cada zona es mostra amb una
-il·lustració i sobre ella hi ha botons/zones clicables: fletxes per canviar de sala, icones sobre els
-objectes, un botó de diàleg quan hi ha un personatge.
+Aventura conversacional en **Java** amb **interfície gràfica i imatges**, a l'estil d'una novel·la
+visual: a dalt, la il·lustració de la zona amb el nom i l'hora sobreimpresos; a sota, un requadre amb
+el text de la partida; i al final, un botó per cada sortida visible i el camp per escriure ordres.
 
 **Entrada híbrida (important).** L'enunciat demana literalment que *«el joc ha d'entendre els següents
 texts: ANAR, ENCENDRE, USAR, DEIXAR, APAGAR, PARLAR, AGAFAR, OBRIR, TANCAR»*. Per això la interfície
 manté **sempre una caixa d'entrada de text** amb un analitzador d'ordres real (`AnalitzadorOrdres`):
 
 - El jugador pot **escriure** `USAR LLANTERNA`, `ANAR NORD`, `AGAFAR NAVALLA`… i funciona.
-- Els **botons** no són una via alternativa: **generen la mateixa cadena de text** i la fan passar pel
-  mateix analitzador. Són una drecera d'accessibilitat, no un motor diferent.
+- Els pocs **botons** que hi ha — les sortides, Mirar i Motxilla — no són una via alternativa:
+  **generen la mateixa cadena de text** i la fan passar pel mateix analitzador. Són una drecera, no un
+  motor diferent. La resta de verbs s'escriuen.
 
 Així es compleix el requisit textual de l'enunciat i, alhora, tenim l'extra gràfic. La lògica interna
 (i per tant el diagrama de classes) és la mateixa que en un joc de text pur; només canvia la capa de
 presentació.
 
-**Imatges.** Cada zona, objecte i personatge tindrà una il·lustració amb un estil visual consistent
-(còmic/anime suau). Es carreguen com a recursos del projecte (`resources/img/…`).
+**Imatges.** Les deu zones tenen il·lustració pròpia, amb estil de fons de novel·la visual (còmic/anime
+suau, no realista). Són a `src/recursos/img/` i es busquen primer al classpath i després al disc, de
+manera que el joc les troba tant des de l'IDE com des de la consola. Si en falta alguna, la finestra
+pinta un substitut i el joc continua. Els objectes i els personatges, de moment, només surten com a text.
 
-**Cicle de llum.** Cada zona té 3 variants d'imatge (dia / capvespre / nit) segons el rellotge intern.
-Com més tarda el jugador, més fosc es veu el bosc. No afegeix lògica nova: només un índex que tria
-quina imatge es mostra.
+**Cicle de llum.** Cada zona té 3 variants d'imatge (dia / capvespre / nit) segons el rellotge intern:
+és la mateixa escena amb una altra llum. Com més tarda el jugador, més fosc es veu el bosc. No afegeix
+lògica nova: només un índex que tria quina imatge es mostra. A més, a la Cova Fosca sense la llanterna
+encesa la imatge es mostra enfosquida, igual que el text diu que no s'hi veu res.
 
 ---
 
@@ -131,7 +135,12 @@ Recorregut mínim de victòria:
 7. **Pont Penjant** — USAR la corda per reforçar el pont i poder travessar.
 8. **Cim del Puig** — OBRIR la caixa del vèrtex geodèsic (pista narrativa).
 9. **Ermita** — PARLAR amb en Tomeu, DEIXAR-li la cantimplora plena, AGAFAR el mapa.
-10. **Refugi Amagat** — USAR el mapa → s'obre la drecera → **ANAR al Camp Base** abans de les 18h.
+10. **Refugi Amagat** — USAR el mapa → s'obre la drecera cap al Corriol **i** es torna a trobar la
+    baixada del Corriol al Camp Base que la boira havia esborrat → **ANAR al Camp Base** abans de les 18h.
+
+> El mapa fa les dues coses alhora perquè si només obrís la drecera fins al Corriol, el camí seguiria
+> tallat més avall i la victòria seria inabastable. És, literalment, per a què serveix un mapa aquí:
+> tornar a trobar el camí de baixada.
 
 ---
 
@@ -212,7 +221,9 @@ Al **Camp Base**. Dona la pista inicial i el missatge de final. No bloqueja res.
 Es mou lliurement entre **Cova Fosca, Clariana i Cascada**. **Cada 2 moviments del jugador es desplaça
 una zona**, només a zones adjacents (mateixa mecànica que el "Malien" de l'enunciat original).
 
-- Si entres a la seva zona **sense haver-lo distret amb la poma**, s'acaba la partida.
+- Si et trobes amb ell tens **un torn de marge**: t'avisa que et barra el pas i esbufega. Si la
+  següent acció no el neutralitza ni t'allunya, carrega i s'acaba la partida. Sense aquest marge
+  seria impossible fer servir la poma, perquè per fer-la servir cal ser a la seva zona.
 - Si li **USES la poma**, queda entretingut la resta de la partida.
 - **Pista ambiental automàtica**: en entrar a qualsevol zona, la descripció diu si se'l sent grunyir
   *a prop* (1 zona de distància) o *lluny*. Així mai es mor de forma injusta.
