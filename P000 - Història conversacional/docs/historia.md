@@ -104,7 +104,7 @@ no-res, un ninot fet de branques penjat d'una rama.
 | 7 | Pont Penjant | Cova Fosca, Cim del Puig | 2 | La sortida cap al Cim **només s'obre** amb el pont reparat amb la corda |
 | 8 | Cim del Puig | Pont Penjant, Ermita Abandonada | 2 | — |
 | 9 | Ermita Abandonada | Cim del Puig, Refugi Amagat | 2 | En Tomeu **bloqueja** la sortida cap al Refugi fins que li ofereixes alguna cosa |
-| 10 | Refugi Amagat | Cova Fosca, Ermita, Corriol del Bosc | 3 | La **drecera** cap al Corriol/Camp Base només s'obre usant el mapa |
+| 10 | Refugi Amagat | Cova Fosca, Corriol del Bosc | 2 | De l'ermita **només s'hi baixa**: no s'hi pot pujar. La **drecera** cap al Corriol/Camp Base només s'obre usant el mapa |
 
 Com es veu, les zones **no tenen totes les mateixes sortides**: van d'1 (Camp Base) a 4 (Cova Fosca),
 i tres d'elles tenen sortides condicionades.
@@ -123,6 +123,12 @@ El joc té tres cadenes de puzles paral·leles que conflueixen al final:
 
 Cap objecte queda inaccessible abans de necessitar-lo: el **bastó i la poma són al Corriol**, abans de
 trepitjar cap zona on patrulla el senglar.
+
+Les tres cadenes s'han de fer **en aquest ordre**, i no és casualitat: a l'ermita només s'hi arriba pel
+pont, i el pont només es repara amb la corda del cofre, que només s'obre amb la navalla, que només es
+veu amb la llanterna encesa. Del refugi a l'ermita no s'hi pot pujar, i en Tomeu tampoc et deixa baixar
+fins que li ofereixes alguna cosa. Sense això, es podia arribar al mapa sense tocar cap d'aquests
+objectes i el joc es guanyava saltant-se la meitat dels puzles.
 
 Recorregut mínim de victòria:
 

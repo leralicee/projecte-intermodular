@@ -80,7 +80,8 @@ public class MapaJoc {
         unir(pont, cim, "nord", "sud");
         unir(cim, ermita, "nord", "sud");
         unir(cova, refugi, "oest", "est");
-        unir(ermita, refugi, "oest", "nord");
+        // de ermita a refugi es baixa pero no es puja (nomes s'arriba pel pont i el cim)
+        ermita.afegirConnexio(new Connexio(refugi, "oest"));
 
         // la tornada pel corriol es el que tancara la boira
         tornadaCampBase = corriol.getConnexio("sud");
@@ -163,6 +164,9 @@ public class MapaJoc {
         tomeu.setRecompensa(new Objecte("mapa",
             "Un mapa dibuixat a ma. Hi ha una drecera marcada que no surt a cap guia."),
             "cantimplora", "poma");
+        // et barra la baixada cap al refugi fins que li ofereixes alguna cosa
+        tomeu.bloquejar(ermita.getConnexio("oest"),
+            "En Tomeu s'aixeca i et barra el pas. \"Aqui no es passa sense oferir res a un vell cansat!\"");
         ermita.afegirElement(tomeu);
 
         PersonatgeMobil senglar = new PersonatgeMobil("senglar",
@@ -200,8 +204,7 @@ public class MapaJoc {
         }
     }
 
-    // obre la drecera i tambe la baixada que havia esborrat la boira. Si nomes obris
-    // la drecera, el cami seguiria tallat mes avall i no es podria guanyar
+    // obre la drecera i tambe la baixada que havia esborrat la boira
     public boolean obrirDrecera() {
         if (dreceraAvall == null || dreceraAvall.esTransitable(null)) {
             return false;
