@@ -40,6 +40,15 @@ public class PersonatgeFix extends Personatge {
         return respostaPerDefecte;
     }
 
+    // li serveix i encara no l'hi has donat? aixi el motor no et pren l'objecte si el rebutja
+    public boolean accepta(Objecte o) {
+        if (o == null) {
+            return false;
+        }
+        String n = o.getNom().toLowerCase();
+        return ofrenesAcceptades.contains(n) && !ofrenesRebudes.contains(n);
+    }
+
     // el jugador li dona un objecte. si li serveix, desbloqueja i recompensa
     public String rebreOfrena(Objecte o) {
         if (o == null) {

@@ -66,6 +66,10 @@ public class Contenidor extends Element {
         return obert;
     }
 
+    public String getClauNecessaria() {
+        return clauNecessaria;
+    }
+
     @Override
     public String descriure() {
         return descripcio + (obert ? " Esta obert." : " Esta tancat.");

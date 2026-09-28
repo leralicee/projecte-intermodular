@@ -126,6 +126,10 @@ public class MotorDeJoc {
         Element destinatari = joc.getJugador().getZonaActual().cercarElement(desti);
         if (aQui != null && destinatari instanceof PersonatgeFix) {
             PersonatgeFix p = (PersonatgeFix) destinatari;
+            // si no la vol, et quedes l'objecte
+            if (!p.accepta(o)) {
+                return ResultatAccio.error(p.rebreOfrena(o));
+            }
             inv.treure(o.getNom());
             StringBuilder sb = new StringBuilder(p.rebreOfrena(o));
             Objecte premi = p.lliurarRecompensa();
@@ -178,6 +182,18 @@ public class MotorDeJoc {
         String a = que.getNom().toLowerCase();
         String b = amb.getNom().toLowerCase();
         Zona zona = joc.getJugador().getZonaActual();
+
+        // fer servir la clau d'un contenidor es una altra manera d'obrir-lo
+        if (amb instanceof Contenidor && a.equalsIgnoreCase(((Contenidor) amb).getClauNecessaria())) {
+            Contenidor contenidor = (Contenidor) amb;
+            ResultatAccio r = contenidor.obrir(joc.getJugador());
+            if (r.esCorrecta()) {
+                for (Objecte o : contenidor.buidar()) {
+                    zona.afegirElement(o);
+                }
+            }
+            return r;
+        }
 
         if (a.equals("basto") && b.equals("pomer")) {
             if (zona.cercarElement("poma") != null) {
