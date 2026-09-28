@@ -114,11 +114,17 @@ public class MapaJoc {
 
         campBase.afegirElement(new Objecte("cantimplora",
             "La teva cantimplora d'alumini. Ara mateix es buida."));
+        campBase.afegirElement(new Objecte("bus",
+            "L'autocar del grup, amb el motor apagat. Al parabrisa hi ha un rellotge\n"
+          + "i, escrita a ma, l'hora de sortida: les 18:00.", false));
 
         corriol.afegirElement(new Objecte("basto",
             "Un basto de bruc, prou llarg per arribar a les branques altes."));
         corriol.afegirElement(new Objecte("pomer",
             "Un pomer salvatge. Hi ha una poma vermella fora del teu abast.", false));
+        corriol.afegirElement(new Objecte("petjades",
+            "Petjades fondes a la terra molla, massa separades per ser d'una persona.\n"
+          + "Van corriol amunt.", false));
 
         Contenidor tronc = new Contenidor("tronc",
             "Un tronc buit caigut al mig de la clariana.");
@@ -130,6 +136,12 @@ public class MapaJoc {
 
         riu.afegirElement(new Objecte("torrent",
             "L'aigua baixa clara i freda. Es pot beure.", false));
+        riu.afegirElement(new Objecte("pedres",
+            "Pedres planes de riu. Fan de gual per travessar sense mullar-se els peus."));
+
+        cascada.afegirElement(new Objecte("cortina",
+            "La cortina d'aigua que cau des de deu metres. Al darrere s'endevina una\n"
+          + "ombra que podria ser un forat, o podria no ser res.", false));
 
         pont.afegirElement(new Objecte("pont",
             "El pont penjant. Li falten taulons i les cordes laterals estan desfilades.", false));
@@ -163,7 +175,7 @@ public class MapaJoc {
         tomeu.afegirResposta("boira", "La boira no es perd ningu que no s'hi vulgui perdre.");
         tomeu.setRecompensa(new Objecte("mapa",
             "Un mapa dibuixat a ma. Hi ha una drecera marcada que no surt a cap guia."),
-            "cantimplora", "poma");
+            "cantimplora plena", "poma");
         // et barra la baixada cap al refugi fins que li ofereixes alguna cosa
         tomeu.bloquejar(ermita.getConnexio("oest"),
             "En Tomeu s'aixeca i et barra el pas. \"Aqui no es passa sense oferir res a un vell cansat!\"");

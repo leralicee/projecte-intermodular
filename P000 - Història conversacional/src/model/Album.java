@@ -5,7 +5,7 @@ import java.util.ArrayList;
 // les fotos que ha fet el jugador. es mostra a l'epileg de qualsevol final
 public class Album {
 
-    public static final int TOTAL_MOMENTS = 8;
+    public static final int TOTAL_MOMENTS = 10;
 
     private final ArrayList<Foto> fotos = new ArrayList<>();
 

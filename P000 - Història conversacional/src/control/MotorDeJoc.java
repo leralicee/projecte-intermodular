@@ -231,8 +231,40 @@ public class MotorDeJoc {
                                   + "bufant i ja no et torna a fer cas.");
         }
 
-        if (a.equals("cantimplora") && (b.equals("torrent") || b.equals("riu"))) {
+        if (a.startsWith("cantimplora") && (b.equals("torrent") || b.equals("riu"))) {
+            if (a.contains("plena")) {
+                return ResultatAccio.error("La cantimplora ja es plena.");
+            }
+            Inventari inv = joc.getJugador().getInventari();
+            if (inv.treure("cantimplora") == null) {
+                return ResultatAccio.error("Hauries de portar la cantimplora a sobre.");
+            }
+            // la canvia per una de plena, que es l'unica que en Tomeu accepta
+            inv.afegir(new Objecte("cantimplora plena",
+                "La teva cantimplora, ara plena d'aigua freda del torrent."));
             return ResultatAccio.ok("Omples la cantimplora amb aigua del torrent.");
+        }
+
+        // darrere la cortina d'aigua hi ha el pas cap a la cova, pero cal llum per veure'l
+        if (a.equals("llanterna") && b.equals("cortina")) {
+            Connexio pas = zona.getConnexio("oest");
+            if (pas == null) {
+                return null;
+            }
+            if (!joc.getJugador().teLlumEncesa()) {
+                return ResultatAccio.error("Amb la llanterna apagada no hi veus res, darrere l'aigua.");
+            }
+            if (pas.esVisible()) {
+                return ResultatAccio.error("El pas de darrere l'aigua ja el tens localitzat.");
+            }
+            pas.obrir();
+            // un cop trobat, tampoc es amagat des de l'altra banda
+            Connexio tornada = pas.getDesti().getConnexio("est");
+            if (tornada != null) {
+                tornada.obrir();
+            }
+            return ResultatAccio.ok("Il.lumines darrere la cortina d'aigua: hi ha un forat\n"
+                                  + "prou gran per passar-hi de costat.");
         }
 
         return null;
