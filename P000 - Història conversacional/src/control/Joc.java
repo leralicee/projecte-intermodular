@@ -74,10 +74,13 @@ public class Joc {
             r = ResultatAccio.error(e.getMissatgeJugador());
         }
 
+        // un error o un MIRAR no son un torn: no gasten el marge davant del senglar
+        // el senglar es mou despres de comprovar el final: si no, marxava just abans de carregar
         if (r.consumeixTemps()) {
             avancarTorn();
+            comprovarFinal();
+            moureSenglar();
         }
-        comprovarFinal();
 
         String extra = recollirAvisos();
         if (!extra.isEmpty()) {
@@ -86,12 +89,22 @@ public class Joc {
         return r;
     }
 
-    // passa el temps i mou el senglar si toca
+    // passa el temps
     public void avancarTorn() {
         torns++;
         rellotge.avancar();
-        if (senglar != null && torns % PersonatgeMobil.CADA_N_TORNS == 0) {
-            senglar.moure();
+    }
+
+    // cada N torns el senglar canvia de zona. si arriba on ets tu, comença el torn de marge
+    public void moureSenglar() {
+        if (senglar == null || estat.esFinal() || torns % PersonatgeMobil.CADA_N_TORNS != 0) {
+            return;
+        }
+        Zona abans = senglar.getZonaActual();
+        senglar.moure();
+        if (senglar.getZonaActual() != abans && trobatAmbSenglar()) {
+            tornsAmbSenglar = 1;
+            avisarSenglar();
         }
     }
 
@@ -121,15 +134,13 @@ public class Joc {
             return estat;
         }
         // trobar-se el senglar no mata de cop: dona un torn per treure la poma o fugir
-        if (senglar != null && !senglar.estaDistret()
-                && senglar.getZonaActual() == jugador.getZonaActual()) {
+        if (trobatAmbSenglar()) {
             tornsAmbSenglar++;
             if (tornsAmbSenglar >= 2) {
                 estat = EstatPartida.DERROTA_SENGLAR;
                 return estat;
             }
-            avisar("El senglar et barra el pas, esbufegant. No et treu els ulls de sobre.\n"
-                 + "Tens un moment per fer alguna cosa abans que carregui.");
+            avisarSenglar();
         } else {
             tornsAmbSenglar = 0;
         }
@@ -144,6 +155,16 @@ public class Joc {
             return estat;
         }
         return estat;
+    }
+
+    private boolean trobatAmbSenglar() {
+        return senglar != null && !senglar.estaDistret()
+            && senglar.getZonaActual() == jugador.getZonaActual();
+    }
+
+    private void avisarSenglar() {
+        avisar("El senglar et barra el pas, esbufegant. No et treu els ulls de sobre.\n"
+             + "Tens un moment per fer alguna cosa abans que carregui.");
     }
 
     public void reiniciar() {

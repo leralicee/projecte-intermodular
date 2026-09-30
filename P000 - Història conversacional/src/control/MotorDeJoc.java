@@ -124,6 +124,10 @@ public class MotorDeJoc {
         // deixar alguna cosa a un personatge es una ofrena
         String desti = aQui != null ? aQui : nom;
         Element destinatari = joc.getJugador().getZonaActual().cercarElement(desti);
+        // si en Tomeu no hi es l'objecte no es pot deixar a terra sense voler
+        if (aQui != null && destinatari == null) {
+            return ResultatAccio.error("Aqui no veig cap " + aQui + ".");
+        }
         if (aQui != null && destinatari instanceof PersonatgeFix) {
             PersonatgeFix p = (PersonatgeFix) destinatari;
             // si no la vol, et quedes l'objecte
@@ -157,6 +161,10 @@ public class MotorDeJoc {
         }
         // el mapa es fa servir tot sol i marca la drecera
         if (que.getNom().equalsIgnoreCase("mapa") && ambNom == null) {
+            if (joc.getJugador().getZonaActual() != joc.getMapa().getZona("Refugi Amagat")) {
+                return ResultatAccio.okSenseTemps("Despleges el mapa. La drecera marcada surt del Refugi Amagat:\n"
+                                                + "hi hauras d'anar per trobar-la.");
+            }
             if (joc.getMapa().obrirDrecera()) {
                 return ResultatAccio.ok("Despleges el mapa. Hi ha una drecera marcada que baixa\n"
                                       + "del refugi fins al corriol, per sota de la boira.");
@@ -166,7 +174,9 @@ public class MotorDeJoc {
         if (ambNom == null) {
             return ResultatAccio.error("Amb que vols fer servir " + que.getNom() + "?");
         }
-        Element amb = cercar(ambNom);
+        //el jugador pot escriure "riu" o "aigua"
+        String nomElement = ambNom.equals("riu") || ambNom.equals("aigua") ? "torrent" : ambNom;
+        Element amb = cercar(nomElement);
         if (amb == null) {
             return ResultatAccio.error("Aqui no veig cap " + ambNom + ".");
         }
@@ -231,7 +241,7 @@ public class MotorDeJoc {
                                   + "bufant i ja no et torna a fer cas.");
         }
 
-        if (a.startsWith("cantimplora") && (b.equals("torrent") || b.equals("riu"))) {
+        if (a.startsWith("cantimplora") && b.equals("torrent")) {
             if (a.contains("plena")) {
                 return ResultatAccio.error("La cantimplora ja es plena.");
             }

@@ -23,6 +23,9 @@ public class AnalitzadorOrdres {
     // separadors entre el primer i el segon complement
     private static final String[] SEPARADORS = {"amb", "sobre", "contra", "dins"};
 
+    // amb DEIXAR, "a" / "al" / "als" marquen a qui ho dones: "DEIXAR LA POMA A TOMEU"
+    private static final String[] DESTINATARIS = {"a", "al", "als"};
+
     // direccions que es poden escriure sense anar davant
     private static final String[] DIRECCIONS = {"nord", "sud", "est", "oest"};
 
@@ -57,9 +60,15 @@ public class AnalitzadorOrdres {
         // "fer servir" son dues paraules, les ajuntem abans de partir el text
         net = net.replace("fer servir", "usar");
 
+        String[] crues = net.split(" ");
+        boolean esDeixar = cercarVerb(crues[0]) == Verb.DEIXAR;
+
         List<String> paraules = new ArrayList<>();
-        for (String p : net.split(" ")) {
-            if (!p.isEmpty() && !esBuida(p)) {
+        for (String p : crues) {
+            // abans de treure les paraules buides, perque "a" ho es
+            if (esDeixar && esDestinatari(p)) {
+                paraules.add("amb");
+            } else if (!p.isEmpty() && !esBuida(p)) {
                 paraules.add(p);
             }
         }
@@ -122,6 +131,10 @@ public class AnalitzadorOrdres {
 
     private boolean esSeparador(String p) {
         return Arrays.asList(SEPARADORS).contains(p);
+    }
+
+    private boolean esDestinatari(String p) {
+        return Arrays.asList(DESTINATARIS).contains(p);
     }
 
     private boolean esDireccio(String p) {
