@@ -5,7 +5,7 @@ import control.Verb;
 
 import java.util.HashMap;
 
-// personatge amb qui es pot parlar. sense inteligencia: nomes una taulade paraules clau -> resposta, com demana l'enunciat
+// personatge amb qui es pot parlar. sense inteligencia: nomes una taula de paraules clau -> resposta, com demana l'enunciat
 public abstract class Personatge extends Element {
 
     protected Zona zonaActual;

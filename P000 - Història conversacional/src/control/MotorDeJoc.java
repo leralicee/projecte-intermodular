@@ -1,5 +1,8 @@
 package control;
 
+import excepcions.AccioNoPermesaException;
+import excepcions.JocException;
+import excepcions.ObjecteNoTrobatException;
 import model.Album;
 import model.Camera;
 import model.Connexio;
@@ -23,7 +26,7 @@ public class MotorDeJoc {
         this.joc = joc;
     }
 
-    public ResultatAccio executar(Ordre o) {
+    public ResultatAccio executar(Ordre o) throws JocException {
         switch (o.getVerb()) {
             case ANAR:      return anar(o.getComplement1());
             case MIRAR:     return mirar(o.getComplement1());
@@ -43,34 +46,36 @@ public class MotorDeJoc {
 
     // MOVIMENT
 
-    private ResultatAccio anar(String desti) {
+    private ResultatAccio anar(String desti) throws JocException {
         if (desti == null) {
             return ResultatAccio.error("On vols anar? Prova ANAR NORD o ANAR A LA CLARIANA.");
         }
         Zona actual = joc.getJugador().getZonaActual();
         Connexio c = actual.getConnexio(desti);
         if (c == null) {
-            return ResultatAccio.error("Des d'aqui no hi ha cap cami cap a " + desti + ".");
+            throw new AccioNoPermesaException("Sortida inexistent: " + desti,
+                "Des d'aqui no hi ha cap cami cap a " + desti + ".");
         }
         if (c.esSecreta() && !joc.getJugador().teLlumEncesa()) {
-            return ResultatAccio.error("Des d'aqui no hi ha cap cami cap a " + desti + ".");
+            throw new AccioNoPermesaException("Sortida inexistent: " + desti,
+                "Des d'aqui no hi ha cap cami cap a " + desti + ".");
         }
         if (!c.esTransitable(joc.getJugador())) {
-            return ResultatAccio.error(c.getMotiuTancada());
+            throw new AccioNoPermesaException("Connexio tancada cap a " + desti, c.getMotiuTancada());
         }
         joc.getJugador().moureA(c.getDesti());
         joc.enEntrarAZona(c.getDesti());
         return ResultatAccio.ok("Vas cap a " + c.getDesti().getNom() + ".");
     }
 
-    private ResultatAccio mirar(String que) {
+    private ResultatAccio mirar(String que) throws JocException {
         Zona z = joc.getJugador().getZonaActual();
         if (que == null) {
             return ResultatAccio.okSenseTemps(joc.descriureZonaActual());
         }
         Element e = cercar(que);
         if (e == null) {
-            return ResultatAccio.error("Aqui no veig cap " + que + ".");
+            throw new ObjecteNoTrobatException(que);
         }
         if (!hiVeu(z)) {
             return ResultatAccio.error("Esta massa fosc per veure res.");
@@ -84,42 +89,46 @@ public class MotorDeJoc {
 
     // OBJECTES
 
-    private ResultatAccio agafar(String nom) {
+    private ResultatAccio agafar(String nom) throws JocException {
         if (nom == null) {
             return ResultatAccio.error("Que vols agafar?");
         }
         Zona z = joc.getJugador().getZonaActual();
         if (!hiVeu(z)) {
-            return ResultatAccio.error("A les fosques no trobaries res. Et caldria llum.");
+            throw new AccioNoPermesaException("Zona fosca sense llum",
+                "A les fosques no trobaries res. Et caldria llum.");
         }
         Element e = z.cercarElement(nom);
         if (e == null) {
-            return ResultatAccio.error("Aqui no veig cap " + nom + ".");
+            throw new ObjecteNoTrobatException(nom);
         }
         if (!(e instanceof Objecte)) {
-            return ResultatAccio.error("No pots endur-te " + e.getNom() + ".");
+            throw new AccioNoPermesaException("Element no agafable: " + e.getNom(),
+                "No pots endur-te " + e.getNom() + ".");
         }
         Objecte o = (Objecte) e;
         if (!o.esAgafable()) {
-            return ResultatAccio.error("No pots endur-te " + o.getNom() + ".");
+            throw new AccioNoPermesaException("Objecte no agafable: " + o.getNom(),
+                "No pots endur-te " + o.getNom() + ".");
         }
         Inventari inv = joc.getJugador().getInventari();
         if (inv.esPle()) {
-            return ResultatAccio.error("La motxilla es plena. Hauries de deixar alguna cosa.");
+            throw new AccioNoPermesaException("Inventari ple",
+                "La motxilla es plena. Hauries de deixar alguna cosa.");
         }
         z.treureElement(o.getNom());
         inv.afegir(o);
         return ResultatAccio.ok("Agafes " + o.getNom() + ".");
     }
 
-    private ResultatAccio deixar(String nom, String aQui) {
+    private ResultatAccio deixar(String nom, String aQui) throws JocException {
         if (nom == null) {
             return ResultatAccio.error("Que vols deixar?");
         }
         Inventari inv = joc.getJugador().getInventari();
         Objecte o = inv.cercar(nom);
         if (o == null) {
-            return ResultatAccio.error("No portes cap " + nom + ".");
+            throw new ObjecteNoTrobatException(nom);
         }
         // deixar alguna cosa a un personatge es una ofrena
         String desti = aQui != null ? aQui : nom;
@@ -144,13 +153,13 @@ public class MotorDeJoc {
         return ResultatAccio.ok("Deixes " + o.getNom() + " a " + joc.getJugador().getZonaActual().getNom() + ".");
     }
 
-    private ResultatAccio usar(String queNom, String ambNom) {
+    private ResultatAccio usar(String queNom, String ambNom) throws JocException {
         if (queNom == null) {
             return ResultatAccio.error("Que vols fer servir?");
         }
         Element que = cercar(queNom);
         if (que == null) {
-            return ResultatAccio.error("No tens cap " + queNom + ".");
+            throw new ObjecteNoTrobatException(queNom);
         }
         if (!(que instanceof Usable)) {
             return ResultatAccio.error(que.getNom() + " no es fa servir amb res.");
@@ -168,7 +177,7 @@ public class MotorDeJoc {
         }
         Element amb = cercar(ambNom);
         if (amb == null) {
-            return ResultatAccio.error("Aqui no veig cap " + ambNom + ".");
+            throw new ObjecteNoTrobatException(ambNom);
         }
         ResultatAccio especial = usQueCanviaElMon(que, amb);
         if (especial != null) {
@@ -178,7 +187,7 @@ public class MotorDeJoc {
     }
 
     // usos que canvien el mapa (fer caure la poma, reforcar el pont...). null si no es cap
-    private ResultatAccio usQueCanviaElMon(Element que, Element amb) {
+    private ResultatAccio usQueCanviaElMon(Element que, Element amb) throws JocException {
         String a = que.getNom().toLowerCase();
         String b = amb.getNom().toLowerCase();
         Zona zona = joc.getJugador().getZonaActual();
@@ -270,10 +279,16 @@ public class MotorDeJoc {
         return null;
     }
 
-    private ResultatAccio obrir(String nom) {
+    private ResultatAccio obrir(String nom) throws JocException {
+        if (nom == null) {
+            return ResultatAccio.error("Que vols obrir?");
+        }
         Element e = exigirElement(nom);
         if (e == null) {
-            return ResultatAccio.error(nom == null ? "Que vols obrir?" : "Aqui no veig cap " + nom + ".");
+            throw new ObjecteNoTrobatException(nom);
+        }
+        if (e.getNom().equalsIgnoreCase("pont")) {
+            return passDelPont(true);
         }
         if (e instanceof Contenidor) {
             ResultatAccio r = ((Contenidor) e).obrir(joc.getJugador());
@@ -287,15 +302,42 @@ public class MotorDeJoc {
         return e.interactuar(Verb.OBRIR, joc.getJugador());
     }
 
-    private ResultatAccio tancar(String nom) {
+    private ResultatAccio tancar(String nom) throws JocException {
+        if (nom == null) {
+            return ResultatAccio.error("Que vols tancar?");
+        }
         Element e = exigirElement(nom);
         if (e == null) {
-            return ResultatAccio.error(nom == null ? "Que vols tancar?" : "Aqui no veig cap " + nom + ".");
+            throw new ObjecteNoTrobatException(nom);
+        }
+        if (e.getNom().equalsIgnoreCase("pont")) {
+            return passDelPont(false);
         }
         return e.interactuar(Verb.TANCAR, joc.getJugador());
     }
 
-    private ResultatAccio encendre(String nom) {
+    // al pont pots abaixar els taulons darrere teu, i tornar-los a posar quan vulguis
+    private ResultatAccio passDelPont(boolean obrir) throws JocException {
+        Connexio tornada = joc.getJugador().getZonaActual().getConnexio("sud");
+        if (tornada == null) {
+            throw new AccioNoPermesaException("El pont no te pas de tornada", "Aqui no hi ha res a tancar.");
+        }
+        if (obrir) {
+            if (tornada.esVisible()) {
+                return ResultatAccio.error("El pas ja es obert.");
+            }
+            tornada.obrir();
+            return ResultatAccio.ok("Tornes a posar els taulons. El pas cap a la cova queda obert.");
+        }
+        if (!tornada.esVisible()) {
+            return ResultatAccio.error("El pas ja es tancat.");
+        }
+        tornada.tancar();
+        tornada.setMotiuTancada("Has abaixat els taulons: per aqui ja no es pot tornar fins que els tornis a posar.");
+        return ResultatAccio.ok("Abaixes els taulons darrere teu. Res no et podra seguir pel pont.");
+    }
+
+    private ResultatAccio encendre(String nom) throws JocException {
         Element e = exigirElement(nom == null ? "llanterna" : nom);
         if (e == null) {
             return ResultatAccio.error("No portes res per fer llum.");
@@ -306,7 +348,7 @@ public class MotorDeJoc {
         return e.interactuar(Verb.ENCENDRE, joc.getJugador());
     }
 
-    private ResultatAccio apagar(String nom) {
+    private ResultatAccio apagar(String nom) throws JocException {
         Element e = exigirElement(nom == null ? "llanterna" : nom);
         if (e == null) {
             return ResultatAccio.error("No portes res per apagar.");
@@ -317,18 +359,19 @@ public class MotorDeJoc {
         return e.interactuar(Verb.APAGAR, joc.getJugador());
     }
 
-    private ResultatAccio parlar(String ambQui, String sobreQue) {
+    private ResultatAccio parlar(String ambQui, String sobreQue) throws JocException {
         Zona z = joc.getJugador().getZonaActual();
         Element e = ambQui == null ? primerPersonatge(z) : z.cercarElement(ambQui);
         if (!(e instanceof Personatge)) {
-            return ResultatAccio.error("Aqui no hi ha ningu amb qui parlar.");
+            throw new AccioNoPermesaException("Cap personatge a la zona",
+                "Aqui no hi ha ningu amb qui parlar.");
         }
         Personatge p = (Personatge) e;
         String tema = sobreQue != null ? sobreQue : ambQui;
         return ResultatAccio.ok(p.getNom() + ": " + p.parlar(tema));
     }
 
-    private ResultatAccio ferFoto(String que) {
+    private ResultatAccio ferFoto(String que) throws JocException {
         Camera camera = (Camera) joc.getJugador().getInventari().cercar("camera");
         if (camera == null) {
             return ResultatAccio.error("No portes la camera.");

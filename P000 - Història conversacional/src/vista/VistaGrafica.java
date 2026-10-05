@@ -4,6 +4,7 @@ import control.Joc;
 import control.Main;
 import control.ResultatAccio;
 import control.Verb;
+import excepcions.RecursNoTrobatException;
 import model.Album;
 import model.Connexio;
 import model.EstatPartida;
@@ -258,7 +259,14 @@ public class VistaGrafica implements Vista {
         Zona z = joc.getJugador().getZonaActual();
         FaseDelDia fase = joc.getFaseDelDia();
         boolean fosc = z.esFosca() && !joc.getJugador().teLlumEncesa();
-        panellImatge.posar(gestorImatges.carregar(z.getImatge(fase)), z.getNom(),
+        ImageIcon imatge;
+        try {
+            imatge = gestorImatges.carregarObligatoria(z.getImatge(fase));
+        } catch (RecursNoTrobatException e) {
+            // sense dibuix el joc tira igual: el panell en pinta un de substitut
+            imatge = null;
+        }
+        panellImatge.posar(imatge, z.getNom(),
                 joc.getRellotge().getHoraFormatada(), joc.getRellotge().minutsRestants(), fosc);
         refrescarSortides(z);
     }

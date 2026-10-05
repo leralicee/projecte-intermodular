@@ -154,13 +154,13 @@ Recorregut mínim de victòria:
 
 | Zona | Accions disponibles |
 |---|---|
-| 1. Camp Base | **AGAFAR** la cantimplora (motxilla) · **PARLAR** amb en Bernat, el conductor (pistes) · mirar el rellotge del bus |
+| 1. Camp Base | **AGAFAR** la cantimplora (motxilla) · **PARLAR** amb en Bernat, el conductor (pistes) · **MIRAR** el bus, que porta l'hora de sortida al parabrisa |
 | 2. Corriol del Bosc | **AGAFAR** el bastó · **USAR** el bastó amb el pomer (cau la poma) · **AGAFAR** la poma · examinar les petjades |
 | 3. Clariana de les Flors | **OBRIR** el tronc buit · **AGAFAR** la llanterna · **TANCAR** el tronc |
 | 4. El Riu | **USAR** la cantimplora (omplir-la al torrent) · **AGAFAR** pedres per fer el gual (narrativa) |
-| 5. Cascada | **ENCENDRE** la llanterna · **OBRIR** el pas secret rere l'aigua (cal la llanterna encesa) · **APAGAR** la llanterna |
+| 5. Cascada | **ENCENDRE** la llanterna · **USAR** la llanterna amb la **cortina** d'aigua per descobrir el pas secret · **APAGAR** la llanterna |
 | 6. Cova Fosca | **ENCENDRE** la llanterna (obligatori per veure-hi) · **AGAFAR** la navalla (només visible amb llum) · **USAR** la poma amb el senglar |
-| 7. Pont Penjant | **USAR** la corda per reforçar el pont · **TANCAR** el pas darrere teu (impedeix que el senglar et segueixi) |
+| 7. Pont Penjant | **USAR** la corda per reforçar el pont · **TANCAR** el pont per abaixar els taulons darrere teu, i **OBRIR**-lo per tornar-los a posar |
 | 8. Cim del Puig | **OBRIR** la caixa del vèrtex geodèsic (hi ha el quadern de registre) · **TANCAR**-la · **USAR** el mapa per orientar-se |
 | 9. Ermita Abandonada | **PARLAR** amb en Tomeu · **DEIXAR**-li la cantimplora o la poma · **AGAFAR** el mapa que et dona |
 | 10. Refugi Amagat | **USAR** la navalla per **OBRIR** el cofre · **AGAFAR** la corda · **USAR** el mapa per desbloquejar la drecera · **TANCAR** el cofre |
@@ -178,7 +178,7 @@ Sis objectes obligatoris agafables/deixables/usables, més dos afegits:
 | 1 | **Cantimplora** | Camp Base (motxilla) | AGAFAR | **USAR** a El Riu per omplir-la; **DEIXAR** a en Tomeu (té set) |
 | 2 | **Bastó** | Corriol del Bosc | AGAFAR | **USAR** amb el pomer del Corriol per fer caure la poma |
 | 3 | **Poma** | Corriol del Bosc (a la branca) | Cal fer-la caure amb el bastó, després AGAFAR | **USAR** amb el senglar per distreure'l; **DEIXAR** a en Tomeu |
-| 4 | **Llanterna** | Clariana, dins un tronc buit | OBRIR el tronc i AGAFAR | **ENCENDRE/APAGAR**: imprescindible a la Cova Fosca i per trobar el pas secret de la Cascada |
+| 4 | **Llanterna** | Clariana, dins un tronc buit | OBRIR el tronc i AGAFAR | **ENCENDRE/APAGAR**: imprescindible a la Cova Fosca i per trobar el pas secret de la Cascada. Té **pila per a 60 minuts de llum**, que només baixa mentre està encesa: per això val la pena apagar-la |
 | 5 | **Navalla** | Cova Fosca, entre pedres | Només visible amb la llanterna encesa | **USAR** per obrir el pany del cofre del Refugi |
 | 6 | **Corda** | Refugi Amagat, dins el cofre | Obrir el cofre amb la navalla i AGAFAR | **USAR** al Pont Penjant per reforçar-lo |
 | 7 | **Mapa de la muntanya** | El dona en Tomeu | Oferir-li la cantimplora plena o la poma | **USAR** al Cim (orientar-se) i al Refugi (obrir la drecera final) |
@@ -191,7 +191,7 @@ Tots vuit es poden **AGAFAR** i **DEIXAR** en qualsevol zona, tal com demana l'e
 ## 7. Extra opcional: l'àlbum de fotos
 
 Cada foto que fas queda guardada. En arribar a qualsevol final es mostra un **epíleg amb la galeria**
-("Has capturat 4 de 8 moments del Puig de les Bruixes"). No afecta la victòria ni la derrota, però dona
+("Has capturat 4 de 10 moments del Puig de les Bruixes"). No afecta la victòria ni la derrota, però dona
 un motiu per explorar totes les zones i per rejugar. És un afegit *per sobre* dels mínims.
 
 ---

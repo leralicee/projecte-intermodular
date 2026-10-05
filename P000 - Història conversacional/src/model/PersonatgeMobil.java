@@ -3,7 +3,7 @@ package model;
 import java.util.ArrayList;
 import java.util.Random;
 
-// el senglar. cada dos torns del jugador es mou a una zona veina de les quete permeses. trobar-se'l sense haver-lo distret acaba la partida
+// el senglar. cada dos torns del jugador es mou a una zona veina de les que te permeses. trobar-se'l sense haver-lo distret acaba la partida
 public class PersonatgeMobil extends Personatge {
 
     public static final int CADA_N_TORNS = 2;

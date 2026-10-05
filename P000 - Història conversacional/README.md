@@ -30,7 +30,7 @@ analitzador. Així el joc «entén els texts» que demana l'enunciat i alhora é
 ### Extres per sobre dels mínims
 
 - 🌗 **Cicle de llum** — cada zona té 3 imatges (dia / capvespre / nit) segons el rellotge intern.
-- 📷 **Càmera i àlbum de fotos** — col·leccionable de 8 moments que es mostra a l'epíleg.
+- 📷 **Càmera i àlbum de fotos** — col·leccionable de 10 moments que es mostra a l'epíleg.
 - 🎭 **Gir narratiu d'en Tomeu** — es revela com el guardià de la llegenda del Puig.
 - 🔁 **Dejà vu** en morir, en comptes d'un *game over* sec.
 - 🌟 **Final secret** si li fas totes dues ofrenes a en Tomeu.

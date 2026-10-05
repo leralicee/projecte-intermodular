@@ -3,7 +3,7 @@ package model;
 import control.ResultatAccio;
 import control.Verb;
 
-// la camera que portes des de l'inici. jo resol cap puzle (omple album)
+// la camera que portes des de l'inici. no resol cap puzle (omple album)
 public class Camera extends Objecte {
 
     private final Album album;

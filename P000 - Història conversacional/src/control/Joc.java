@@ -6,7 +6,9 @@ import model.Camera;
 import model.EstatPartida;
 import model.FaseDelDia;
 import model.Jugador;
+import model.Llanterna;
 import model.MapaJoc;
+import model.Objecte;
 import model.PersonatgeFix;
 import model.PersonatgeMobil;
 import model.Rellotge;
@@ -30,6 +32,10 @@ public class Joc {
     // torns seguits a la mateixa zona que el senglar (al segon carrega)
     private int tornsAmbSenglar;
 
+    // aquests dos no es reinicien: passen d'una partida a la seguent
+    private boolean recordDelPuig;
+    private boolean dejaVu;
+
     private final AnalitzadorOrdres analitzador = new AnalitzadorOrdres();
     private final MotorDeJoc motor = new MotorDeJoc(this);
 
@@ -51,6 +57,10 @@ public class Joc {
             aliats.add(mapa.getTomeu());
         }
         jugador.getInventari().afegir(new Camera(album));
+        if (recordDelPuig) {
+            jugador.getInventari().afegir(new Objecte("record",
+                "Un palet blanc del torrent que et va donar en Tomeu. No serveix per a res."));
+        }
         jugador.getZonaActual().marcarVisitada();
         estat = EstatPartida.EN_CURS;
         torns = 0;
@@ -90,8 +100,29 @@ public class Joc {
     public void avancarTorn() {
         torns++;
         rellotge.avancar();
+        gastarPila();
         if (senglar != null && torns % PersonatgeMobil.CADA_N_TORNS == 0) {
             senglar.moure();
+        }
+    }
+
+    // la pila baixa nomes mentre la llanterna esta encesa, per aixo val la pena apagar-la
+    private void gastarPila() {
+        for (Objecte o : jugador.getInventari().getObjectes()) {
+            if (!(o instanceof Llanterna)) {
+                continue;
+            }
+            Llanterna l = (Llanterna) o;
+            if (!l.estaEncesa()) {
+                continue;
+            }
+            l.gastarBateria(Rellotge.MINUTS_PER_ORDRE);
+            if (l.getBateria() == 0) {
+                l.apagar();
+                avisar("La llanterna parpelleja un cop i s'apaga. La pila s'ha acabat.");
+            } else if (l.getBateria() == 20 || l.getBateria() == 10) {
+                avisar("La llum de la llanterna es va afeblint.");
+            }
         }
     }
 
@@ -126,6 +157,7 @@ public class Joc {
             tornsAmbSenglar++;
             if (tornsAmbSenglar >= 2) {
                 estat = EstatPartida.DERROTA_SENGLAR;
+                dejaVu = true;
                 return estat;
             }
             avisar("El senglar et barra el pas, esbufegant. No et treu els ulls de sobre.\n"
@@ -137,6 +169,9 @@ public class Joc {
             PersonatgeFix tomeu = mapa.getTomeu();
             boolean totesLesOfrenes = tomeu != null && tomeu.haRebutTot();
             estat = totesLesOfrenes ? EstatPartida.FINAL_SECRET : EstatPartida.VICTORIA;
+            if (estat == EstatPartida.FINAL_SECRET) {
+                recordDelPuig = true;
+            }
             return estat;
         }
         if (rellotge.sHaAcabatElTemps()) {
@@ -179,7 +214,10 @@ public class Joc {
              + "Alces el cap: el grup ha desaparegut corriol amunt i la boira ha comencat\n"
              + "a baixar, espessa i freda. No hi ha ningu. Nomes tu, la motxilla i un bosc\n"
              + "que, juraries, no tenia aquest aspecte fa dos minuts.\n\n"
-             + "El bus marxa a les 18:00. Escriu AJUDA per veure que pots fer.\n";
+             + "El bus marxa a les 18:00. Escriu AJUDA per veure que pots fer.\n"
+             + (dejaVu ? "\nUn flaix confus et travessa el cap: uns ullals, la fosca, un gruny.\n"
+                       + "Aixo ja ho has viscut. Aquesta vegada ves amb compte amb el senglar.\n" : "")
+             + (recordDelPuig ? "\nA la motxilla hi trobes un palet blanc que no recordes haver-hi posat.\n" : "");
     }
 
     public String textFinal() {

@@ -11,7 +11,7 @@ public class Llanterna extends Objecte implements Encenible {
 
     public Llanterna() {
         super("llanterna", "Una llanterna vella pero solida. Encara li queda pila.");
-        this.bateria = 120;
+        this.bateria = 60;
     }
 
     @Override

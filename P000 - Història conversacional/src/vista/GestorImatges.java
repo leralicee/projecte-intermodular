@@ -1,5 +1,7 @@
 package vista;
 
+import excepcions.RecursNoTrobatException;
+
 import javax.swing.ImageIcon;
 import java.io.File;
 import java.net.URL;
@@ -57,6 +59,15 @@ public class GestorImatges {
             }
         }
         return null;
+    }
+
+    // com carregar(), pero avisa amb una excepcio si la imatge no hi es
+    public ImageIcon carregarObligatoria(String nomFitxer) throws RecursNoTrobatException {
+        ImageIcon icona = carregar(nomFitxer);
+        if (icona == null) {
+            throw new RecursNoTrobatException(RUTA_CLASSPATH + nomFitxer);
+        }
+        return icona;
     }
 
     public boolean teImatge(String nomFitxer) {
