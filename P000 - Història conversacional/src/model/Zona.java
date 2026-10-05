@@ -123,7 +123,7 @@ public class Zona {
         }
         String n = nom.toLowerCase();
         for (Element e : elements) {
-            if (e.getNom().toLowerCase().equals(n)) {
+            if (e.esDiu(n)) {
                 return e;
             }
         }

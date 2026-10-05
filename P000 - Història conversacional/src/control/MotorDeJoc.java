@@ -75,7 +75,7 @@ public class MotorDeJoc {
         }
         Element e = cercar(que);
         if (e == null) {
-            throw new ObjecteNoTrobatException(que);
+            throw new ObjecteNoTrobatException(que, suggerir(que));
         }
         if (!hiVeu(z)) {
             return ResultatAccio.error("Esta massa fosc per veure res.");
@@ -100,7 +100,7 @@ public class MotorDeJoc {
         }
         Element e = z.cercarElement(nom);
         if (e == null) {
-            throw new ObjecteNoTrobatException(nom);
+            throw new ObjecteNoTrobatException(nom, suggerir(nom));
         }
         if (!(e instanceof Objecte)) {
             throw new AccioNoPermesaException("Element no agafable: " + e.getNom(),
@@ -128,7 +128,7 @@ public class MotorDeJoc {
         Inventari inv = joc.getJugador().getInventari();
         Objecte o = inv.cercar(nom);
         if (o == null) {
-            throw new ObjecteNoTrobatException(nom);
+            throw new ObjecteNoTrobatException(nom, suggerir(nom));
         }
         // deixar alguna cosa a un personatge es una ofrena
         String desti = aQui != null ? aQui : nom;
@@ -163,7 +163,7 @@ public class MotorDeJoc {
         }
         Element que = cercar(queNom);
         if (que == null) {
-            throw new ObjecteNoTrobatException(queNom);
+            throw new ObjecteNoTrobatException(queNom, suggerir(queNom));
         }
         if (!(que instanceof Usable)) {
             return ResultatAccio.error(que.getNom() + " no es fa servir amb res.");
@@ -180,20 +180,75 @@ public class MotorDeJoc {
             }
             return ResultatAccio.okSenseTemps("Tornes a mirar el mapa. La drecera ja la tens localitzada.");
         }
+        // sense segon complement, provem si a la zona hi ha res amb que encaixi:
+        // aixi "OMPLIR LA CANTIMPLORA" al riu ja s'entén sense dir amb que
         if (ambNom == null) {
+            for (Element candidat : joc.getJugador().getZonaActual().getElements()) {
+                ResultatAccio r = provarUs(que, candidat);
+                if (r != null) {
+                    return r;
+                }
+            }
             return ResultatAccio.error("Amb que vols fer servir " + que.getNom() + "?");
         }
-        //el jugador pot escriure "riu" o "aigua"
-        String nomElement = ambNom.equals("riu") || ambNom.equals("aigua") ? "torrent" : ambNom;
-        Element amb = cercar(nomElement);
+        Element amb = cercar(ambNom);
         if (amb == null) {
-            throw new ObjecteNoTrobatException(ambNom);
+            throw new ObjecteNoTrobatException(ambNom, suggerir(ambNom));
         }
-        ResultatAccio especial = usQueCanviaElMon(que, amb);
+        ResultatAccio especial = provarUs(que, amb);
         if (especial != null) {
             return especial;
         }
         return ((Usable) que).usarAmb(amb);
+    }
+
+    // prova la parella en els dos sentits: tant fa "el basto amb el pomer" com a l'inreves
+    private ResultatAccio provarUs(Element a, Element b) throws JocException {
+        if (a == b) {
+            return null;
+        }
+        ResultatAccio r = usQueCanviaElMon(a, b);
+        return r != null ? r : usQueCanviaElMon(b, a);
+    }
+
+    // el nom mes assemblat d'entre el que hi ha a la zona i a la motxilla, o null
+    private String suggerir(String escrit) {
+        String millor = null;
+        int millorDistancia = 3;
+        java.util.ArrayList<Element> candidats = new java.util.ArrayList<>();
+        candidats.addAll(joc.getJugador().getZonaActual().getElements());
+        candidats.addAll(joc.getJugador().getInventari().getObjectes());
+        String busca = escrit.toLowerCase();
+        for (Element e : candidats) {
+            int d = distancia(busca, e.getNom().toLowerCase());
+            for (String paraula : e.getNom().toLowerCase().split(" ")) {
+                d = Math.min(d, distancia(busca, paraula));
+            }
+            if (d < millorDistancia) {
+                millorDistancia = d;
+                millor = e.getNom();
+            }
+        }
+        return millor;
+    }
+
+    // distancia d'edicio, per saber si el jugador nomes s'ha equivocat de lletres
+    private int distancia(String a, String b) {
+        int[] fila = new int[b.length() + 1];
+        for (int j = 0; j <= b.length(); j++) {
+            fila[j] = j;
+        }
+        for (int i = 1; i <= a.length(); i++) {
+            int diagonal = fila[0];
+            fila[0] = i;
+            for (int j = 1; j <= b.length(); j++) {
+                int anterior = fila[j];
+                int cost = a.charAt(i - 1) == b.charAt(j - 1) ? 0 : 1;
+                fila[j] = Math.min(Math.min(fila[j] + 1, fila[j - 1] + 1), diagonal + cost);
+                diagonal = anterior;
+            }
+        }
+        return fila[b.length()];
     }
 
     // usos que canvien el mapa (fer caure la poma, reforcar el pont...). null si no es cap
@@ -259,8 +314,10 @@ public class MotorDeJoc {
                 return ResultatAccio.error("Hauries de portar la cantimplora a sobre.");
             }
             // la canvia per una de plena, que es l'unica que en Tomeu accepta
-            inv.afegir(new Objecte("cantimplora plena",
-                "La teva cantimplora, ara plena d'aigua freda del torrent."));
+            Objecte plena = new Objecte("cantimplora plena",
+                "La teva cantimplora, ara plena d'aigua freda del torrent.");
+            plena.afegirAlies("cantimplora");
+            inv.afegir(plena);
             return ResultatAccio.ok("Omples la cantimplora amb aigua del torrent.");
         }
 
@@ -295,7 +352,7 @@ public class MotorDeJoc {
         }
         Element e = exigirElement(nom);
         if (e == null) {
-            throw new ObjecteNoTrobatException(nom);
+            throw new ObjecteNoTrobatException(nom, suggerir(nom));
         }
         if (e.getNom().equalsIgnoreCase("pont")) {
             return passDelPont(true);
@@ -318,7 +375,7 @@ public class MotorDeJoc {
         }
         Element e = exigirElement(nom);
         if (e == null) {
-            throw new ObjecteNoTrobatException(nom);
+            throw new ObjecteNoTrobatException(nom, suggerir(nom));
         }
         if (e.getNom().equalsIgnoreCase("pont")) {
             return passDelPont(false);

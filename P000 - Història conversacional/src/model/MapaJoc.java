@@ -112,8 +112,10 @@ public class MapaJoc {
                                 Zona cascada, Zona cova, Zona pont, Zona cim,
                                 Zona ermita, Zona refugi) {
 
-        campBase.afegirElement(new Objecte("cantimplora",
-            "La teva cantimplora d'alumini. Ara mateix es buida."));
+        Objecte cantimplora = new Objecte("cantimplora",
+            "La teva cantimplora d'alumini. Ara mateix es buida.");
+        cantimplora.afegirAlies("cantimplora buida", "ampolla", "bidon");
+        campBase.afegirElement(cantimplora);
         campBase.afegirElement(new Objecte("bus",
             "L'autocar del grup, amb el motor apagat. Al parabrisa hi ha un rellotge\n"
           + "i, escrita a ma, l'hora de sortida: les 18:00.", false));
@@ -187,6 +189,21 @@ public class MapaJoc {
         senglar.afegirZonaPermesa(clariana);
         senglar.afegirZonaPermesa(cascada);
         senglar.situarA(cova);
+
+        // noms alternatius: el jugador no te per que encertar la paraula exacta
+        campBase.cercarElement("bus").afegirAlies("autocar", "autobus", "rellotge");
+        corriol.cercarElement("pomer").afegirAlies("pomera", "arbre", "branca");
+        corriol.cercarElement("petjades").afegirAlies("petjada", "rastre", "empremtes");
+        clariana.cercarElement("tronc").afegirAlies("soca", "tronc buit");
+        riu.cercarElement("torrent").afegirAlies("riu", "aigua", "corrent");
+        cascada.cercarElement("cortina").afegirAlies("cascada", "salt", "aigua");
+        pont.cercarElement("pont").afegirAlies("taulons", "passarella");
+        refugi.cercarElement("cofre").afegirAlies("bagul", "caixa de fusta", "pany");
+        cim.cercarElement("caixa").afegirAlies("vertex", "fita", "vertex geodesic");
+        campBase.cercarElement("Bernat").afegirAlies("conductor", "xofer");
+        ermita.cercarElement("Tomeu").afegirAlies("ermita vella", "vell", "avi", "home");
+        senglar.afegirAlies("porc", "bestia", "animal");
+
         this.senglar = senglar;
         this.tomeu = tomeu;
     }

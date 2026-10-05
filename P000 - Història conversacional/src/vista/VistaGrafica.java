@@ -7,10 +7,17 @@ import control.Verb;
 import excepcions.RecursNoTrobatException;
 import model.Album;
 import model.Connexio;
+import model.Contenidor;
+import model.Element;
 import model.EstatPartida;
 import model.FaseDelDia;
 import model.Inventari;
+import model.Objecte;
+import model.Personatge;
 import model.Zona;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -20,6 +27,8 @@ import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import javax.swing.JMenuItem;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
@@ -43,6 +52,8 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Insets;
 import java.awt.Rectangle;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.RenderingHints;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -98,8 +109,17 @@ public class VistaGrafica implements Vista {
         arrel.setBackground(FONS);
         finestra.setContentPane(arrel);
 
-        panellImatge = new PanellImatge();
+        panellImatge = new PanellImatge(gestorImatges);
         panellImatge.setPreferredSize(new Dimension(AMPLE, ALT_IMATGE));
+        panellImatge.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                Element tocat = panellImatge.elementA(e.getX(), e.getY());
+                if (tocat != null) {
+                    menuElement(tocat).show(panellImatge, e.getX(), e.getY());
+                }
+            }
+        });
         arrel.add(panellImatge, BorderLayout.NORTH);
         arrel.add(construirCaixaText(), BorderLayout.CENTER);
         arrel.add(construirPanellInferior(), BorderLayout.SOUTH);
@@ -220,6 +240,38 @@ public class VistaGrafica implements Vista {
         return p;
     }
 
+    // en clicar un element surten nomes els verbs que hi tenen sentit. cada opcio
+    // escriu l'ordre i la passa pel mateix analitzador que el camp de text
+    private JPopupMenu menuElement(Element e) {
+        JPopupMenu menu = new JPopupMenu();
+        String nom = e.getNom();
+        if (e instanceof Personatge) {
+            afegirOpcio(menu, "Parlar amb " + nom, "PARLAR AMB " + nom);
+        }
+        if (e instanceof Contenidor) {
+            afegirOpcio(menu, "Obrir " + nom, "OBRIR " + nom);
+            afegirOpcio(menu, "Tancar " + nom, "TANCAR " + nom);
+        }
+        if (e instanceof Objecte && ((Objecte) e).esAgafable()) {
+            afegirOpcio(menu, "Agafar " + nom, "AGAFAR " + nom);
+        }
+        afegirOpcio(menu, "Mirar " + nom, "MIRAR " + nom);
+        JMenuItem usar = new JMenuItem("Usar alguna cosa amb " + nom + "...");
+        usar.addActionListener(ev -> {
+            campOrdre.setText("USAR  AMB " + nom);
+            campOrdre.setCaretPosition(5);
+            campOrdre.requestFocusInWindow();
+        });
+        menu.add(usar);
+        return menu;
+    }
+
+    private void afegirOpcio(JPopupMenu menu, String etiqueta, String ordre) {
+        JMenuItem item = new JMenuItem(etiqueta);
+        item.addActionListener(ev -> enviar(ordre));
+        menu.add(item);
+    }
+
     private void onBotoVerb(Verb v) {
         enviar(v.name());
     }
@@ -266,8 +318,10 @@ public class VistaGrafica implements Vista {
             // sense dibuix el joc tira igual: el panell en pinta un de substitut
             imatge = null;
         }
-        panellImatge.posar(imatge, z.getNom(),
-                joc.getRellotge().getHoraFormatada(), joc.getRellotge().minutsRestants(), fosc);
+        // a les fosques no es veuen ni els elements, igual que diu el text
+        List<Element> visibles = fosc ? new ArrayList<>() : z.getElements();
+        panellImatge.posar(imatge, z.getNom(), joc.getRellotge().getHoraFormatada(),
+                joc.getRellotge().minutsRestants(), fosc, visibles);
         refrescarSortides(z);
     }
 
@@ -390,19 +444,88 @@ public class VistaGrafica implements Vista {
     // la imatge de la zona. l'escala sense deformar-la, hi posa el nom i l'hora a sobre i la fosqueja si no hi veus
     private static class PanellImatge extends JPanel {
 
+        private static final int MIDA_SPRITE = 78;
+
+        private final GestorImatges gestor;
         private ImageIcon imatge;
         private String nomZona = "";
         private String hora = "";
         private int restants;
         private boolean fosc;
+        private List<Element> elements = new ArrayList<>();
 
-        void posar(ImageIcon imatge, String nomZona, String hora, int restants, boolean fosc) {
+        // on ha quedat dibuixat cada element, per saber quin s'ha clicat
+        private final List<Rectangle> caselles = new ArrayList<>();
+
+        PanellImatge(GestorImatges gestor) {
+            this.gestor = gestor;
+        }
+
+        void posar(ImageIcon imatge, String nomZona, String hora, int restants, boolean fosc,
+                   List<Element> elements) {
             this.imatge = imatge;
             this.nomZona = nomZona;
             this.hora = hora;
             this.restants = restants;
             this.fosc = fosc;
+            this.elements = new ArrayList<>(elements);
             repaint();
+        }
+
+        // quin element hi ha en aquest punt, o null
+        Element elementA(int x, int y) {
+            for (int i = 0; i < caselles.size() && i < elements.size(); i++) {
+                if (caselles.get(i).contains(x, y)) {
+                    return elements.get(i);
+                }
+            }
+            return null;
+        }
+
+        // dibuixa els elements de la zona en fila a la part baixa, amb el nom a sota
+        private void dibuixarElements(Graphics2D g2, int w, int h) {
+            caselles.clear();
+            if (elements.isEmpty()) {
+                return;
+            }
+            Font lletra = new Font(LLETRA, Font.PLAIN, 11);
+            g2.setFont(lletra);
+            FontMetrics fm = g2.getFontMetrics();
+            int alçadaFranja = MIDA_SPRITE + 30;
+            int dalt = h - alçadaFranja;
+
+            // franja fosca al darrere: aixi la fila es llegeix com una barra d'accions
+            // i no com part del dibuix (si no, el bus del sprite i el del fons es trepitjaven)
+            g2.setColor(new Color(15, 16, 22, 150));
+            g2.fillRect(0, dalt, w, alçadaFranja);
+            g2.setColor(new Color(255, 255, 255, 28));
+            g2.drawLine(0, dalt, w, dalt);
+
+            int pas = MIDA_SPRITE + 24;
+            int x = 18;
+            int y = dalt + 4;
+            for (Element e : elements) {
+                if (x + MIDA_SPRITE > w - 10) {
+                    break;
+                }
+                Rectangle casella = new Rectangle(x, y, MIDA_SPRITE, MIDA_SPRITE + 18);
+                caselles.add(casella);
+                ImageIcon sprite = gestor.carregar(e.getImatge());
+                if (sprite != null) {
+                    g2.drawImage(sprite.getImage(), x, y, MIDA_SPRITE, MIDA_SPRITE, null);
+                } else {
+                    // sense dibuix, un rodonet perque igualment es pugui clicar
+                    g2.setColor(BOTO);
+                    g2.fillRoundRect(x, y, MIDA_SPRITE, MIDA_SPRITE, 14, 14);
+                }
+                String nom = e.getNom();
+                int ampleNom = fm.stringWidth(nom);
+                int xn = x + (MIDA_SPRITE - ampleNom) / 2;
+                int yn = y + MIDA_SPRITE + 15;
+                g2.setColor(TEXT);
+                g2.drawString(nom, xn, yn);
+                x += pas;
+            }
         }
 
         @Override
@@ -432,8 +555,11 @@ public class VistaGrafica implements Vista {
             }
 
             // la part de baix es fon amb el fons de la finestra
-            g2.setPaint(new GradientPaint(0, h - 50, new Color(22, 23, 30, 0), 0, h, FONS));
-            g2.fillRect(0, h - 50, w, 50);
+            int finsOn = elements.isEmpty() ? h : h - MIDA_SPRITE - 30;
+            g2.setPaint(new GradientPaint(0, finsOn - 40, new Color(22, 23, 30, 0), 0, finsOn, FONS));
+            g2.fillRect(0, finsOn - 40, w, 40);
+
+            dibuixarElements(g2, w, h);
 
             String detall = hora + "   ·   queden " + restants + " min";
             Font gran = new Font(LLETRA, Font.BOLD, 16);

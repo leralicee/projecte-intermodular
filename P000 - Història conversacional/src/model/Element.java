@@ -1,5 +1,7 @@
 package model;
 
+import java.util.ArrayList;
+
 import control.ResultatAccio;
 import control.Verb;
 
@@ -9,6 +11,9 @@ public abstract class Element {
     protected String nom;
     protected String descripcio;
     protected String imatge;
+
+    // altres maneres d'anomenar-lo: el jugador escriu "riu" i es refereix al torrent
+    private final ArrayList<String> alies = new ArrayList<>();
 
     protected Element(String nom, String descripcio) {
         this.nom = nom;
@@ -21,6 +26,21 @@ public abstract class Element {
 
     // com reacciona aquest element a un verb concret
     public abstract ResultatAccio interactuar(Verb v, Jugador j);
+
+    public void afegirAlies(String... noms) {
+        for (String n : noms) {
+            alies.add(n.toLowerCase());
+        }
+    }
+
+    // es diu aixi, o el jugador li pot dir aixi?
+    public boolean esDiu(String n) {
+        if (n == null) {
+            return false;
+        }
+        String b = n.toLowerCase();
+        return nom.toLowerCase().equals(b) || alies.contains(b);
+    }
 
     public String getNom() {
         return nom;

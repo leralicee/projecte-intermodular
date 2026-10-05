@@ -35,7 +35,7 @@ public class Inventari {
         }
         String n = nom.toLowerCase();
         for (Objecte o : objectes) {
-            if (o.getNom().toLowerCase().equals(n)) {
+            if (o.esDiu(n)) {
                 return o;
             }
         }

@@ -30,18 +30,24 @@ public class AnalitzadorOrdres {
     private static final String[] DIRECCIONS = {"nord", "sud", "est", "oest"};
 
     public AnalitzadorOrdres() {
-        afegir(Verb.ANAR, "anar", "ves", "vas", "va", "camina", "mou", "moure", "ir");
-        afegir(Verb.AGAFAR, "agafar", "agafa", "agaf", "pren", "prendre", "coge", "coger");
+        afegir(Verb.ANAR, "anar", "ves", "vas", "va", "camina", "mou", "moure", "ir",
+               "travessar", "travessa", "creuar", "creua", "puja", "pujar", "baixa", "baixar",
+               "entra", "entrar", "surt", "sortir");
+        afegir(Verb.AGAFAR, "agafar", "agafa", "agaf", "pren", "prendre", "coge", "coger",
+               "recull", "recollir", "emporta", "endur");
         afegir(Verb.DEIXAR, "deixar", "deixa", "dona", "donar", "solta", "soltar");
-        afegir(Verb.USAR, "usar", "usa", "utilitza", "utilitzar", "fer servir");
+        afegir(Verb.USAR, "usar", "usa", "utilitza", "utilitzar", "fer servir",
+               "omplir", "omple", "beure", "beu", "tallar", "talla", "reparar", "repara",
+               "lligar", "lliga", "picar", "pica", "llençar", "llenca", "tirar", "tira");
         afegir(Verb.OBRIR, "obrir", "obre", "obra");
         afegir(Verb.TANCAR, "tancar", "tanca");
-        afegir(Verb.ENCENDRE, "encendre", "encen", "engega", "engegar");
+        afegir(Verb.ENCENDRE, "encendre", "encen", "engega", "engegar", "illumina", "illuminar");
         afegir(Verb.APAGAR, "apagar", "apaga");
         afegir(Verb.PARLAR, "parlar", "parla", "digues", "dir", "pregunta", "preguntar");
         afegir(Verb.FER_FOTO, "fotografiar", "fotografia", "foto", "retratar");
         afegir(Verb.INVENTARI, "inventari", "motxilla", "bossa", "i");
-        afegir(Verb.MIRAR, "mirar", "mira", "observar", "observa", "examinar", "examina", "veure");
+        afegir(Verb.MIRAR, "mirar", "mira", "observar", "observa", "examinar", "examina", "veure",
+               "inspecciona", "inspeccionar", "llegir", "llegeix");
     }
 
     private void afegir(Verb v, String... paraules) {
