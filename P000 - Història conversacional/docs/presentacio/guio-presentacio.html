@@ -1,0 +1,450 @@
+<!doctype html>
+<html lang="ca">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>
+  /* base: el full es per llegir-lo al mobil o en una segona pantalla mentre presentes */
+  html { -webkit-text-size-adjust: 100%; }
+  body { margin: 0; }
+  img { max-width: 100%; }
+  [hidden] { display: none !important; }
+</style>
+<title>Guió del Puig</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Public+Sans:wght@400;500;700&family=JetBrains+Mono:wght@400;700&display=swap">
+<style>
+/* Run sheet amb columna de temps a l'esquerra i guió a la dreta; a mòbil s'apila.
+   Paleta presa de la mateixa finestra del joc: nit al bosc i l'ambre del rellotge. */
+:root {
+  color-scheme: dark;
+  --nit:      #16171e;
+  --caixa:    #22242e;
+  --caixa-2:  #2b2e3a;
+  --vora:     #383c4a;
+  --text:     #e9e6df;
+  --suau:     #9a9eae;
+  --ambre:    #e8a456;
+  --molsa:    #8fb08a;
+  --alerta:   #ef6f5c;
+
+  --display: "Fraunces", Georgia, serif;
+  --cos: "Public Sans", system-ui, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, monospace;
+}
+
+body {
+  background: var(--nit);
+  color: var(--text);
+  font-family: var(--cos);
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+.full { max-width: 980px; margin: 0 auto; padding-inline: 18px; padding-block: 0 56px; }
+
+/* ---- barra del cronòmetre ---- */
+.barra {
+  position: sticky;
+  top: env(safe-area-inset-top, 0px);
+  z-index: 20;
+  background: rgba(22,23,30,.94);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--vora);
+  margin-inline: -18px;
+  padding: 10px 18px calc(10px + env(safe-area-inset-top, 0px));
+}
+.barra-fila { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.rellotge {
+  font-family: var(--mono); font-size: 30px; font-weight: 700;
+  font-variant-numeric: tabular-nums; letter-spacing: -.02em; color: var(--ambre);
+}
+.rellotge.passat { color: var(--alerta); }
+.ara-fent { flex: 1 1 180px; min-width: 0; font-size: 13px; color: var(--suau); }
+.ara-fent b { color: var(--text); font-weight: 500; }
+button {
+  font-family: var(--cos); font-size: 13px; font-weight: 500;
+  color: var(--text); background: var(--caixa-2);
+  border: 1px solid var(--vora); border-radius: 8px;
+  padding: 7px 14px; cursor: pointer;
+}
+button:hover { background: var(--vora); }
+button.principal { background: var(--ambre); border-color: var(--ambre); color: #1a1408; font-weight: 700; }
+button:focus-visible { outline: 2px solid var(--molsa); outline-offset: 2px; }
+.progres { height: 3px; background: var(--vora); border-radius: 2px; margin-top: 9px; overflow: hidden; }
+.progres i { display: block; height: 100%; width: 0; background: var(--ambre); }
+
+/* ---- capçalera ---- */
+header { padding-block: 34px 10px; }
+h1 {
+  font-family: var(--display); font-weight: 700; font-size: clamp(30px, 6vw, 44px);
+  line-height: 1.05; margin: 0 0 10px; text-wrap: balance; letter-spacing: -.01em;
+}
+.entradeta { color: var(--suau); max-width: 60ch; margin: 0; }
+
+/* ---- abans de començar ---- */
+.previ {
+  border: 1px solid var(--vora); border-radius: 12px;
+  padding: 16px 18px; margin-block: 26px; background: var(--caixa);
+}
+.previ h2 {
+  font-family: var(--cos); font-size: 11px; font-weight: 700; letter-spacing: .12em;
+  text-transform: uppercase; color: var(--molsa); margin: 0 0 10px;
+}
+.previ ol { margin: 0; padding-left: 20px; display: grid; gap: 7px; }
+.previ li::marker { color: var(--suau); }
+
+/* ---- blocs del guió ---- */
+.bloc {
+  display: grid; grid-template-columns: 96px 1fr; gap: 20px;
+  padding-block: 22px; border-top: 1px solid var(--vora);
+}
+.bloc.activa .titol { color: var(--ambre); }
+.bloc.activa .codi { background: var(--ambre); border-color: var(--ambre); color: #1a1408; }
+.codi {
+  font-family: var(--mono); font-size: 13px; font-weight: 700; font-variant-numeric: tabular-nums;
+  background: var(--caixa-2); border: 1px solid var(--vora); border-radius: 7px;
+  padding: 5px 0; text-align: center; height: fit-content;
+}
+.durada { font-family: var(--mono); font-size: 11px; color: var(--suau); text-align: center; margin-top: 6px; }
+.cos { min-width: 0; }
+.titol {
+  font-family: var(--display); font-weight: 700; font-size: 23px;
+  margin: -4px 0 12px; line-height: 1.15; text-wrap: balance;
+}
+.pantalla {
+  font-size: 13px; color: var(--molsa);
+  border-left: 2px solid var(--molsa); padding-left: 11px; margin-bottom: 14px;
+}
+.pantalla b { font-weight: 700; letter-spacing: .08em; text-transform: uppercase; font-size: 11px; display: block; }
+
+/* el que dius */
+.diu { border-left: 3px solid var(--ambre); padding: 2px 0 2px 15px; margin-block: 13px; }
+.diu p { margin: 0 0 9px; }
+.diu p:last-child { margin-bottom: 0; }
+.diu em { color: var(--ambre); font-style: normal; font-weight: 700; }
+
+/* indicacions d'escena */
+.fer {
+  font-size: 13.5px; color: var(--suau); background: var(--caixa);
+  border-radius: 9px; padding: 9px 13px; margin-block: 13px;
+}
+.fer code, code.ordre {
+  font-family: var(--mono); font-size: .92em; color: var(--text);
+  background: var(--caixa-2); border-radius: 5px; padding: 1px 6px;
+}
+
+h3.sub {
+  font-family: var(--cos); font-size: 11px; font-weight: 700; letter-spacing: .1em;
+  text-transform: uppercase; color: var(--suau); margin: 20px 0 8px;
+  display: flex; gap: 9px; align-items: baseline;
+}
+h3.sub span { font-family: var(--mono); color: var(--ambre); letter-spacing: 0; }
+
+/* seqüència d'ordres de la demo */
+.passos { display: grid; gap: 10px; margin-block: 14px; }
+.pas { display: grid; grid-template-columns: minmax(0,auto) 1fr; gap: 14px; align-items: baseline; }
+.pas code {
+  font-family: var(--mono); font-size: 13.5px; color: var(--text);
+  background: var(--caixa-2); border: 1px solid var(--vora);
+  border-radius: 7px; padding: 5px 10px; white-space: nowrap;
+}
+.pas span { font-size: 14px; color: var(--suau); min-width: 0; }
+
+/* avís del senglar */
+.senglar {
+  border: 1px solid var(--alerta); border-radius: 12px;
+  background: rgba(239,111,92,.09); padding: 15px 17px; margin-block: 18px;
+}
+.senglar h4 {
+  font-family: var(--cos); font-size: 12px; font-weight: 700; letter-spacing: .1em;
+  text-transform: uppercase; color: var(--alerta); margin: 0 0 9px;
+}
+.senglar code {
+  display: inline-block; font-family: var(--mono); font-weight: 700; font-size: 15px;
+  background: var(--alerta); color: #231008; border-radius: 7px; padding: 5px 11px; margin-block: 4px;
+}
+.senglar p { margin: 9px 0 0; font-size: 14px; }
+
+/* xuleta i preguntes */
+.final { display: grid; grid-template-columns: repeat(auto-fit, minmax(290px, 1fr)); gap: 18px; margin-top: 34px; }
+.targeta { border: 1px solid var(--vora); border-radius: 12px; padding: 17px 19px; background: var(--caixa); min-width: 0; }
+.targeta h2 { font-family: var(--display); font-size: 19px; font-weight: 700; margin: 0 0 12px; }
+.xuleta { font-family: var(--mono); font-size: 13px; line-height: 1.95; margin: 0; white-space: pre; overflow-x: auto; }
+.targeta ol { margin: 0; padding-left: 19px; display: grid; gap: 9px; font-size: 14.5px; }
+.targeta ol::marker, .targeta li::marker { color: var(--ambre); }
+
+.control { margin-top: 26px; font-size: 14px; color: var(--suau); border-top: 1px solid var(--vora); padding-top: 18px; }
+.control b { color: var(--ambre); font-family: var(--mono); }
+
+@media (max-width: 620px) {
+  .bloc { grid-template-columns: 1fr; gap: 12px; }
+  .codi { display: inline-block; padding-inline: 13px; }
+  .durada { display: inline-block; margin-left: 9px; }
+}
+@media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } }
+</style>
+</head>
+<body>
+<div class="full">
+
+  <div class="barra">
+    <div class="barra-fila">
+      <div class="rellotge" id="rellotge">0:00</div>
+      <div class="ara-fent" id="araFent">Prem <b>Comença</b> per assajar amb el cronòmetre</div>
+      <button class="principal" id="btnAnar">Comença</button>
+      <button id="btnZero">Posa a zero</button>
+    </div>
+    <div class="progres"><i id="barraProgres"></i></div>
+  </div>
+
+  <header>
+    <h1>Guió del Puig</h1>
+    <p class="entradeta">Presentació de <em>L'Excursió del Puig de les Bruixes</em>. Nou minuts, una sola persona. El contingut ocupa 8:45, així que el novè minut és el teu coixí.</p>
+  </header>
+
+  <div class="previ">
+    <h2>Abans de començar</h2>
+    <ol>
+      <li>Joc obert al Camp Base i diagrama obert al darrere, <strong>col·locats abans d'entrar a l'aula</strong>.</li>
+      <li>Engega el joc des de la carpeta <code class="ordre">P000 - Història conversacional</code>, o les imatges no carreguen.</li>
+      <li>Prova-ho <strong>a l'ordinador i al projector de debò</strong>, no només al teu.</li>
+      <li>La xuleta d'ordres, impresa al costat del teclat.</li>
+      <li>Canvia de finestra tres vegades com a màxim en tota la presentació.</li>
+    </ol>
+  </div>
+
+  <section class="bloc" data-inici="0" data-fi="45">
+    <div><div class="codi">0:00</div><div class="durada">45 s</div></div>
+    <div class="cos">
+      <h2 class="titol">Obertura</h2>
+      <div class="pantalla"><b>A la pantalla</b>La finestra del joc, ja oberta al Camp Base.</div>
+      <div class="diu">
+        <p>Això és <em>L'Excursió del Puig de les Bruixes</em>, una aventura conversacional feta en Java.</p>
+        <p>El protagonista es despista del grup fent una foto, baixa la boira i es perd. Ha de tornar al bus abans de les sis.</p>
+      </div>
+      <div class="fer">Escrius <code>nord</code> i esperes que canviï la imatge.</div>
+      <div class="diu">
+        <p>Cada zona té la seva il·lustració, i a dalt a l'esquerra hi ha l'hora. El bus marxa a les sis en punt i cada ordre gasta dos minuts: hi ha seixanta torns per tornar.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="bloc" data-inici="45" data-fi="105">
+    <div><div class="codi">0:45</div><div class="durada">1 min</div></div>
+    <div class="cos">
+      <h2 class="titol">Què demanava l'enunciat</h2>
+      <div class="pantalla"><b>A la pantalla</b>Segueixes al joc.</div>
+      <div class="diu">
+        <p>L'enunciat demanava deu zones, inventari, com a mínim sis objectes, un personatge amb qui parlar i que el joc tingués final. Tot això hi és.</p>
+        <p>Però hi havia una frase que condicionava tot el disseny: <em>«el joc ha d'entendre els següents texts»</em>. No botons: textos.</p>
+      </div>
+      <div class="fer">Assenyales el camp d'ordres, i després els botons i els dibuixos de sota.</div>
+      <div class="diu">
+        <p>Per això el joc té un analitzador d'ordres de debò. I els botons de les sortides, i els dibuixos dels objectes, <em>no són un camí alternatiu</em>: escriuen la mateixa ordre i la fan passar pel mateix analitzador. Són una drecera, no un motor diferent.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="bloc" data-inici="105" data-fi="165">
+    <div><div class="codi">1:45</div><div class="durada">1 min</div></div>
+    <div class="cos">
+      <h2 class="titol">El mapa</h2>
+      <div class="pantalla"><b>A la pantalla</b>Diagrama, pàgina 2 — Mapa de zones. <strong>Primer canvi de finestra.</strong></div>
+      <div class="diu">
+        <p>Aquest és el mapa. Deu zones, i no totes tenen les mateixes sortides: el Camp Base en té una i la Cova Fosca en té quatre. Les línies vermelles són passos condicionats.</p>
+      </div>
+      <div class="fer">Vas assenyalant amb el cursor mentre ho expliques.</div>
+      <div class="diu">
+        <p>Per travessar el pont cal reparar-lo amb una corda. La corda és dins un cofre que només s'obre amb una navalla. I la navalla és en una cova fosca on no s'hi veu res sense la llanterna.</p>
+        <p>O sigui: llanterna, navalla, cofre, corda, pont. <em>L'ordre no és casualitat, està forçat pel disseny.</em> I al final hi ha en Tomeu, l'ermità, que et dona el mapa de baixada si li ofereixes alguna cosa.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="bloc" data-inici="165" data-fi="315">
+    <div><div class="codi">2:45</div><div class="durada">2 min 30</div></div>
+    <div class="cos">
+      <h2 class="titol">Arquitectura</h2>
+      <div class="pantalla"><b>A la pantalla</b>Diagrama, pàgina 1. Fes zoom a cada zona de la qual parlis.</div>
+      <div class="diu">
+        <p>Trenta-sis classes repartides en quatre paquets: <em>model</em> és l'estat del món, <em>control</em> executa les ordres, <em>vista</em> ho ensenya i <em>excepcions</em> són els errors propis. Vull destacar-ne tres decisions.</p>
+      </div>
+
+      <h3 class="sub"><span>3:05</span> Decisió 1 · la jerarquia</h3>
+      <div class="diu">
+        <p>Tot amb què es pot interactuar hereta d'<em>Element</em>, que és abstracta: d'ella pengen Objecte, Contenidor i Personatge.</p>
+        <p>A sobre hi ha dues interfícies: <em>Encenible</em>, que implementa la llanterna, i <em>Usable</em>, que implementen els objectes. Van ser interfícies i no classes perquè una llanterna ja és un objecte i no pot heretar dues vegades. És el cas típic on calen interfícies.</p>
+        <p>Gràcies a això, quan el jugador escriu una ordre el motor no pregunta de quin tipus és cada cosa: li demana a l'element que reaccioni, i cada classe sap què fer.</p>
+      </div>
+
+      <h3 class="sub"><span>3:55</span> Decisió 2 · una sola porta d'entrada</h3>
+      <div class="diu">
+        <p>Els verbs són un <em>enum</em>, no textos solts: el switch del motor treballa sobre casos tancats i no hi ha cap verb escrit a mà enmig del codi.</p>
+        <p>I tot entra per un sol lloc. A la finestra hi ha un mètode <em>enviar</em> que és l'únic camí: el camp de text, els botons de dalt, els botons de sortida i el menú dels dibuixos hi acaben tots. Tot es converteix en text i passa per l'analitzador.</p>
+        <p>Per això els botons de sortida no estan escrits a mà: es generen recorrent les connexions visibles de la zona, amb la fletxa segons la direcció. <em>Si canvio el mapa, els botons canvien sols.</em></p>
+      </div>
+
+      <h3 class="sub"><span>4:35</span> Decisió 3 · les excepcions</h3>
+      <div class="diu">
+        <p>La tercera respon a una competència que demanava l'enunciat: la gestió d'errors amb excepcions.</p>
+        <p>Hi ha una classe <em>JocException</em> abstracta i quatre filles. Cadascuna guarda dos missatges: el tècnic, per depurar, i el que veu el jugador. Al jugador no li dius «element inexistent», li dius «aquí no veig cap navalla».</p>
+        <p>I com que totes hereten de la mateixa, el bucle del joc les caça <em>totes amb un sol catch</em>.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="bloc" data-inici="315" data-fi="450">
+    <div><div class="codi">5:15</div><div class="durada">2 min 15</div></div>
+    <div class="cos">
+      <h2 class="titol">Demostració</h2>
+      <div class="pantalla"><b>A la pantalla</b>Tornes al joc. <strong>Segon canvi de finestra, i l'últim.</strong></div>
+      <div class="diu"><p>Us ensenyo com funciona per dins.</p></div>
+      <div class="passos">
+        <div class="pas"><code>agafar cantimplora</code><span>«Agafar objectes. Fixeu-vos que desapareix del dibuix de sota: allà hi ha el que hi ha a la zona.»</span></div>
+        <div class="pas"><code>nord</code><span></span></div>
+        <div class="pas"><code>agafar basto</code><span></span></div>
+        <div class="pas"><code>usar el basto amb el pomer</code><span>«Aquí combino dos objectes: pico la branca amb el bastó i cau la poma.»</span></div>
+        <div class="pas"><code>agafar poma</code><span></span></div>
+        <div class="pas"><code>nord</code><span>Zona del senglar. Atenció a l'avís.</span></div>
+        <div class="pas"><code>obrir tronc</code><span>«Un contenidor. En obrir-lo, la llanterna que hi havia dins passa a la zona i ja la puc agafar.»</span></div>
+        <div class="pas"><code>agafar llanterna</code><span></span></div>
+        <div class="pas"><code>encendre llanterna</code><span>«Té estat, i té pila: només es gasta mentre està encesa, per això val la pena apagar-la.»</span></div>
+        <div class="pas"><code>nord</code><span>«I això és la Cova Fosca sense llum. El text diu que no s'hi veu res, i la imatge també.»</span></div>
+      </div>
+      <div class="fer">Si et sobren segons, <strong>una</strong> de les dues: escriure <code>agafar la lanterna</code> amb errada perquè surti «Volies dir llanterna?», o clicar un dibuix i triar del menú.</div>
+
+      <div class="senglar">
+        <h4>Si surt l'avís del senglar</h4>
+        <code>usar la poma amb el senglar</code>
+        <p>El següent que escrius, sense excepcions. Reaccionant se sobreviu sempre.</p>
+        <p>I explica-ho com si estigués previst: «el senglar es mou sol cada dos torns; si te'l trobes et dona un torn per reaccionar». Queda millor que la ruta neta.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="bloc" data-inici="450" data-fi="495">
+    <div><div class="codi">7:30</div><div class="durada">45 s</div></div>
+    <div class="cos">
+      <h2 class="titol">Com ho has treballat</h2>
+      <div class="pantalla"><b>A la pantalla</b>Terminal amb <code class="ordre">git log --oneline</code>.</div>
+      <div class="diu">
+        <p>L'he fet per capes, i cada commit compila sol: primer les excepcions i els verbs, després el model, l'analitzador, el motor, i l'última capa la interfície. Per això el joc no es podia executar fins al final: el punt d'entrada és l'últim que té sentit escriure.</p>
+        <p>I una cosa que va ser la més útil de tot. Vaig fer un script que juga partides senceres sol. Executant-ne vint vaig descobrir que <em>es podia guanyar en setze ordres</em>, saltant-se la llanterna, la navalla, el cofre, la corda i el pont: hi havia un camí que no havia previst.</p>
+        <p>Ho vaig tancar. Ara aquesta drecera guanya zero vegades de vint, i el recorregut bo en guanya vint de vint.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="bloc" data-inici="495" data-fi="525">
+    <div><div class="codi">8:15</div><div class="durada">30 s</div></div>
+    <div class="cos">
+      <h2 class="titol">Tancament</h2>
+      <div class="diu">
+        <p>Em queda pendent una galeria per a les fotos que es poden fer durant la partida, i opcions de diàleg amb en Tomeu que canviïn el final.</p>
+        <p>Però els mínims hi són tots, el joc es pot acabar de quatre maneres diferents i es pot tornar a jugar. Gràcies.</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="final">
+    <div class="targeta">
+      <h2>Xuleta per al teclat</h2>
+      <p class="xuleta">agafar cantimplora
+nord
+agafar basto
+usar el basto amb el pomer
+agafar poma
+nord
+obrir tronc
+agafar llanterna
+encendre llanterna
+nord
+
+si avisa el senglar →
+usar la poma amb el senglar</p>
+    </div>
+    <div class="targeta">
+      <h2>Les cinc preguntes probables</h2>
+      <ol>
+        <li>Si <code class="ordre">JocException</code> no fos abstracta, quin problema tindries?</li>
+        <li>Per què una ordre errònia no gasta temps de joc?</li>
+        <li>Si afegeixes el verb <code class="ordre">OLORAR</code>, quins fitxers toques?</li>
+        <li>Per què <code class="ordre">Encenible</code> és interfície i no una classe?</li>
+        <li>Per què <code class="ordre">Zona.imatges</code> és un array i <code class="ordre">Zona.elements</code> un ArrayList?</li>
+      </ol>
+    </div>
+  </div>
+
+  <p class="control">Marques de control: <b>2:45</b> arquitectura · <b>5:15</b> demostració · <b>7:30</b> git. Si a les 5:15 no has arribat a la demostració, salta't la decisió 2 i continua.</p>
+
+</div>
+
+<script>
+(function () {
+  var blocs = Array.prototype.slice.call(document.querySelectorAll(".bloc"));
+  var rellotge = document.getElementById("rellotge");
+  var araFent = document.getElementById("araFent");
+  var barraProgres = document.getElementById("barraProgres");
+  var btnAnar = document.getElementById("btnAnar");
+  var btnZero = document.getElementById("btnZero");
+  var TOTAL = 540;
+  var segons = 0, corrent = false, ultimActiu = -1, tic = null;
+
+  function mmss(s) {
+    var m = Math.floor(s / 60);
+    return m + ":" + String(Math.floor(s % 60)).padStart(2, "0");
+  }
+
+  function pinta() {
+    rellotge.textContent = mmss(segons);
+    rellotge.classList.toggle("passat", segons > TOTAL);
+    barraProgres.style.width = Math.min(100, (segons / TOTAL) * 100) + "%";
+
+    var actiu = -1;
+    for (var i = 0; i < blocs.length; i++) {
+      var ini = +blocs[i].dataset.inici, fi = +blocs[i].dataset.fi;
+      if (segons >= ini && segons < fi) { actiu = i; }
+    }
+    if (actiu === -1 && segons >= +blocs[blocs.length - 1].dataset.fi) { actiu = blocs.length - 1; }
+    if (actiu === -1) { actiu = 0; }
+
+    for (var j = 0; j < blocs.length; j++) {
+      blocs[j].classList.toggle("activa", j === actiu && corrent);
+    }
+
+    if (corrent) {
+      var titol = blocs[actiu].querySelector(".titol").textContent;
+      var queda = Math.max(0, +blocs[actiu].dataset.fi - segons);
+      araFent.innerHTML = "Ara: <b>" + titol + "</b> · " + queda + " s per al següent";
+      if (actiu !== ultimActiu) {
+        ultimActiu = actiu;
+        blocs[actiu].scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    }
+  }
+
+  function alterna() {
+    corrent = !corrent;
+    btnAnar.textContent = corrent ? "Pausa" : "Continua";
+    if (corrent) {
+      tic = setInterval(function () { segons++; pinta(); }, 1000);
+    } else {
+      clearInterval(tic);
+    }
+    pinta();
+  }
+
+  btnAnar.addEventListener("click", alterna);
+  btnZero.addEventListener("click", function () {
+    clearInterval(tic);
+    corrent = false; segons = 0; ultimActiu = -1;
+    btnAnar.textContent = "Comença";
+    araFent.innerHTML = "Prem <b>Comença</b> per assajar amb el cronòmetre";
+    pinta();
+  });
+
+  pinta();
+})();
+</script>
+</body>
+</html>
