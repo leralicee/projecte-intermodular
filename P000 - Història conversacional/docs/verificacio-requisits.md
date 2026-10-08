@@ -34,6 +34,10 @@ Cap verb queda decoratiu: tots tenen com a mínim un ús que fa avançar el joc.
 | **APAGAR** | Llanterna |
 | **PARLAR** | En Tomeu (ermita) i en Bernat (camp base) |
 
+A més dels 9 obligatoris, el joc entén `MIRAR`, `INVENTARI`, `FOTO` i `OBJECTIUS`. Aquest últim diu al
+jugador en quin punt de la història és: `Joc.objectius()` dedueix les fites de l'estat del món i la
+vista en mostra la del moment sobre la imatge. Com `MIRAR` i `INVENTARI`, no consumeix temps de partida.
+
 ## 3. Competències transversals de l'enunciat
 
 | Competència | Com es cobreix |

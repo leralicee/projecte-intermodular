@@ -17,13 +17,20 @@ texts: ANAR, ENCENDRE, USAR, DEIXAR, APAGAR, PARLAR, AGAFAR, OBRIR, TANCAR»*. P
 manté **sempre una caixa d'entrada de text** amb un analitzador d'ordres real (`AnalitzadorOrdres`):
 
 - El jugador pot **escriure** `USAR LLANTERNA`, `ANAR NORD`, `AGAFAR NAVALLA`… i funciona.
-- Els pocs **botons** que hi ha — les sortides, Mirar i Motxilla — no són una via alternativa:
+- Els pocs **botons** que hi ha — les sortides, Mirar, Motxilla i Objectius — no són una via alternativa:
   **generen la mateixa cadena de text** i la fan passar pel mateix analitzador. Són una drecera, no un
   motor diferent. La resta de verbs s'escriuen.
 
 Així es compleix el requisit textual de l'enunciat i, alhora, tenim l'extra gràfic. La lògica interna
 (i per tant el diagrama de classes) és la mateixa que en un joc de text pur; només canvia la capa de
 presentació.
+
+**Objectius.** El jugador sempre sap què persegueix. A dalt a l'esquerra, sota l'hora, hi ha la fita
+del moment, i amb l'ordre `OBJECTIUS` (o el botó) surt la llista sencera: el que ja està fet, el que
+toca ara i un `[?]` per al que encara no s'ha descobert, de manera que la llista no avança els puzles
+que el jugador no ha vist. Les fites no es guarden enlloc: `Joc.objectius()` les dedueix de l'estat del
+món cada vegada que algú les demana, i per això no es poden desincronitzar. Quan una fita es completa,
+el joc anuncia la següent tot sol.
 
 **Imatges.** Les deu zones tenen il·lustració pròpia, amb estil de fons de novel·la visual (còmic/anime
 suau, no realista). Són a `src/recursos/img/` i es busquen primer al classpath i després al disc, de

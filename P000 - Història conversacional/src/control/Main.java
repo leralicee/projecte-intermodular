@@ -14,6 +14,7 @@ public class Main {
         + "  DEIXAR <objecte>           APAGAR <objecte>      PARLAR AMB <personatge>\n"
         + "  AGAFAR <objecte>           OBRIR <objecte>       TANCAR <objecte>\n"
         + "  MIRAR [objecte]            INVENTARI             FOTO\n"
+        + "  OBJECTIUS                  (que has de fer i que ja has fet)\n"
         + "Tambe pots escriure nomes la direccio: NORD, SUD, EST, OEST.\n"
         + "AJUDA torna a mostrar aixo. SORTIR abandona la partida.";
 

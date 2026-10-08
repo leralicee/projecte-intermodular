@@ -3,18 +3,25 @@ package control;
 import excepcions.JocException;
 import model.Album;
 import model.Camera;
+import model.Connexio;
+import model.Contenidor;
+import model.Element;
 import model.EstatPartida;
 import model.FaseDelDia;
+import model.Inventari;
 import model.Jugador;
 import model.Llanterna;
 import model.MapaJoc;
 import model.Objecte;
+import model.Objectiu;
 import model.PersonatgeFix;
 import model.PersonatgeMobil;
 import model.Rellotge;
 import model.Zona;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 // estat de la partida i bucle de joc. cada torn segueix l'ordre de l'enunciat: es mostra la zona, s'espera una ordre, s'avalua i es comprova el final
 public class Joc {
@@ -76,6 +83,7 @@ public class Joc {
         if (estat.esFinal()) {
             return ResultatAccio.error("La partida ja s'ha acabat.");
         }
+        String objectiuAbans = objectiuActual();
         ResultatAccio r;
         try {
             Ordre o = analitzador.analitzar(text);
@@ -99,6 +107,15 @@ public class Joc {
                 } else {
                     tornsAmbSenglar = 0;
                 }
+            }
+        }
+
+        // si l'ordre ha fet avancar la historia, diem quina es la fita seguent. nomes quan canvia:
+        // repetir-la cada torn seria soroll
+        if (!estat.esFinal()) {
+            String objectiuAra = objectiuActual();
+            if (objectiuAra != null && !objectiuAra.equals(objectiuAbans)) {
+                avisar("Nou objectiu: " + objectiuAra);
             }
         }
 
@@ -233,6 +250,15 @@ public class Joc {
                 sb.append(z.getElements().get(i).getNom());
             }
         }
+        // la tornada es la part que mes costa d'endevinar: marquem per on es baixa
+        String tornada = direccioCapAlBus();
+        if (tornada != null) {
+            Connexio c = z.getConnexio(tornada);
+            sb.append("\nCap al bus: ").append(tornada);
+            if (c != null) {
+                sb.append(" (").append(c.getDesti().getNom()).append(')');
+            }
+        }
         return sb.toString();
     }
 
@@ -243,7 +269,9 @@ public class Joc {
              + "Alces el cap: el grup ha desaparegut corriol amunt i la boira ha comencat\n"
              + "a baixar, espessa i freda. No hi ha ningu. Nomes tu, la motxilla i un bosc\n"
              + "que, juraries, no tenia aquest aspecte fa dos minuts.\n\n"
-             + "El bus marxa a les 18:00. Escriu AJUDA per veure que pots fer.\n"
+             + "El bus marxa a les 18:00. Escriu OBJECTIUS per saber que has de fer\n"
+             + "i AJUDA per veure com dir-ho.\n"
+             + (objectiuActual() != null ? "\nNou objectiu: " + objectiuActual() + "\n" : "")
              + (dejaVu ? "\nUn flaix confus et travessa el cap: uns ullals, la fosca, un gruny.\n"
                        + "Aixo ja ho has viscut. Aquesta vegada ves amb compte amb el senglar.\n" : "")
              + (recordDelPuig ? "\nA la motxilla hi trobes un palet blanc que no recordes haver-hi posat.\n" : "");
@@ -267,6 +295,134 @@ public class Joc {
             default:
                 return "";
         }
+    }
+
+    // OBJECTIUS
+
+    // les fites del joc, deduides de l'estat del mon i no d'una llista de marques. aixi no es
+    // poden desincronitzar: si el jugador deixa la navalla, la fita del cofre segueix feta
+    // perque el que es mira es si el cofre ja es obert
+    public ArrayList<Objectiu> objectius() {
+        Inventari inv = jugador.getInventari();
+        Zona cova = mapa.getZona("Cova Fosca");
+        Zona pont = mapa.getZona("Pont Penjant");
+        Zona ermita = mapa.getZona("Ermita");
+        Zona refugi = mapa.getZona("Refugi");
+
+        boolean llum = inv.conte("llanterna");
+        boolean cofreObert = contenidorObert(refugi, "cofre");
+        boolean pontFet = esPasObert(pont, "nord");
+        boolean teMapa = inv.conte("mapa");
+        boolean drecera = esPasObert(refugi, "sud");
+        boolean covaExplorada = inv.conte("navalla") || cofreObert || pontFet;
+
+        ArrayList<Objectiu> llista = new ArrayList<>();
+        llista.add(new Objectiu("Trobar alguna cosa per veure-hi a les fosques",
+            true, llum));
+        llista.add(new Objectiu("Explorar la cova fosca i veure que hi ha entre les pedres",
+            llum || esVisitada(cova), covaExplorada));
+        llista.add(new Objectiu("Obrir el cofre del refugi",
+            esVisitada(refugi), cofreObert || pontFet));
+        llista.add(new Objectiu("Reforcar el pont penjant per poder pujar al cim",
+            esVisitada(pont), pontFet));
+        llista.add(new Objectiu("Aconseguir el mapa d'en Tomeu: no el regala, el canvia",
+            esVisitada(ermita), teMapa || drecera));
+        llista.add(new Objectiu("Obrir la drecera del refugi i baixar al Camp Base",
+            teMapa, estat == EstatPartida.VICTORIA));
+        return llista;
+    }
+
+    // CAMI DE TORNADA
+
+    // la direccio que has de fer servir ara per anar cap al bus, o null si de moment no hi ha cami.
+    // mentre la boira tingui tallat el corriol no en troba cap, aixi que la pista nomes apareix
+    // quan la tornada ja es possible de debo
+    public String direccioCapAlBus() {
+        Zona desti = mapa.getZonaInicial();
+        Zona origen = jugador.getZonaActual();
+        // abans que caigui la boira encara no s'ha perdut ningu: no cal cap pista
+        if (origen == desti || !boiraActivada) {
+            return null;
+        }
+        // cerca en amplada: de cada zona en guardem la primera direccio del cami que hi porta
+        ArrayDeque<Zona> cua = new ArrayDeque<>();
+        HashMap<Zona, String> primerPas = new HashMap<>();
+        cua.add(origen);
+        primerPas.put(origen, null);
+        while (!cua.isEmpty()) {
+            Zona z = cua.poll();
+            for (Connexio c : z.getConnexions()) {
+                if (!c.esVisible() || !c.esTransitable(jugador)) {
+                    continue;
+                }
+                Zona seguent = c.getDesti();
+                if (primerPas.containsKey(seguent)) {
+                    continue;
+                }
+                // si encara som a la zona d'origen, el primer pas es aquesta direccio.
+                // si no, arrosseguem el que ja portava la zona d'on venim
+                String pas = z == origen ? c.getDireccio() : primerPas.get(z);
+                if (seguent == desti) {
+                    return pas;
+                }
+                primerPas.put(seguent, pas);
+                cua.add(seguent);
+            }
+        }
+        return null;
+    }
+
+    // el text de la fita que toca ara, o null si no en queda cap de descoberta
+    public String objectiuActual() {
+        for (Objectiu o : objectius()) {
+            if (o.esPendent()) {
+                return o.getText();
+            }
+        }
+        return null;
+    }
+
+    // el que es mostra quan el jugador escriu OBJECTIUS
+    public String llistarObjectius() {
+        StringBuilder sb = new StringBuilder("OBJECTIUS\n");
+        String actual = objectiuActual();
+        boolean ocults = false;
+        for (Objectiu o : objectius()) {
+            if (!o.esDescobert()) {
+                ocults = true;
+                continue;
+            }
+            boolean esAra = actual != null && actual.equals(o.getText());
+            sb.append("  ").append(o.marca(esAra)).append(' ').append(o.getText()).append('\n');
+        }
+        if (ocults) {
+            sb.append("  [?] Encara no saps que mes et caldra.\n");
+        }
+        sb.append("El bus marxa a les 18:00 i et queden ")
+          .append(rellotge.minutsRestants()).append(" minuts.");
+        return sb.toString();
+    }
+
+    private boolean esVisitada(Zona z) {
+        return z != null && z.esVisitada();
+    }
+
+    // una sortida que el jugador ja veu i pot fer servir
+    private boolean esPasObert(Zona z, String direccio) {
+        if (z == null) {
+            return false;
+        }
+        Connexio c = z.getConnexio(direccio);
+        return c != null && c.esVisible();
+    }
+
+    // un contenidor d'una zona que ja s'ha obert
+    private boolean contenidorObert(Zona z, String nom) {
+        if (z == null) {
+            return false;
+        }
+        Element e = z.cercarElement(nom);
+        return e instanceof Contenidor && ((Contenidor) e).estaObert();
     }
 
     private void avisar(String text) {

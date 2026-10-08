@@ -31,6 +31,7 @@ public class MotorDeJoc {
             case ANAR:      return anar(o.getComplement1());
             case MIRAR:     return mirar(o.getComplement1());
             case INVENTARI: return inventari();
+            case OBJECTIUS: return objectius();
             case AGAFAR:    return agafar(o.getComplement1());
             case DEIXAR:    return deixar(o.getComplement1(), o.getComplement2());
             case USAR:      return usar(o.getComplement1(), o.getComplement2());
@@ -85,6 +86,11 @@ public class MotorDeJoc {
 
     private ResultatAccio inventari() {
         return ResultatAccio.okSenseTemps(joc.getJugador().getInventari().llistar());
+    }
+
+    // consultar que has de fer no es una accio dins del bosc: no gasta temps
+    private ResultatAccio objectius() {
+        return ResultatAccio.okSenseTemps(joc.llistarObjectius());
     }
 
     // OBJECTES

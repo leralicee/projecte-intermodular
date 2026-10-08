@@ -48,6 +48,7 @@ public class AnalitzadorOrdres {
         afegir(Verb.INVENTARI, "inventari", "motxilla", "bossa", "i");
         afegir(Verb.MIRAR, "mirar", "mira", "observar", "observa", "examinar", "examina", "veure",
                "inspecciona", "inspeccionar", "llegir", "llegeix");
+        afegir(Verb.OBJECTIUS, "objectius", "objectiu", "missio", "tasques", "pendents", "pendent");
     }
 
     private void afegir(Verb v, String... paraules) {
@@ -63,8 +64,10 @@ public class AnalitzadorOrdres {
             throw new OrdreInvalidaException(text);
         }
 
-        // "fer servir" son dues paraules, les ajuntem abans de partir el text
+        // frases de mes d'una paraula: les canviem pel verb abans de partir el text
         net = net.replace("fer servir", "usar");
+        net = net.replace("que haig de fer", "objectius");
+        net = net.replace("que he de fer", "objectius");
 
         String[] crues = net.split(" ");
         boolean esDeixar = cercarVerb(crues[0]) == Verb.DEIXAR;

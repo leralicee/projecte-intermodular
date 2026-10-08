@@ -219,13 +219,16 @@ public class VistaGrafica implements Vista {
         mirar.addActionListener(e -> onBotoVerb(Verb.MIRAR));
         JButton motxilla = new BotoPla("Motxilla", BOTO, BOTO_SOBRE, TEXT);
         motxilla.addActionListener(e -> onBotoVerb(Verb.INVENTARI));
+        JButton objectius = new BotoPla("Objectius", BOTO, BOTO_SOBRE, TEXT);
+        objectius.setToolTipText("Que has de fer");
+        objectius.addActionListener(e -> onBotoVerb(Verb.OBJECTIUS));
         JButton ajuda = new BotoPla("?", BOTO, BOTO_SOBRE, TEXT);
         ajuda.setToolTipText("Ajuda");
         ajuda.addActionListener(e -> mostrarText(Main.AJUDA, estilSuau));
         botoEnviar = new BotoPla("Fes-ho", ACCENT, ACCENT_SOBRE, FONS);
         botoEnviar.addActionListener(e -> enviar(campOrdre.getText()));
 
-        botonsVerbs = new JButton[] {mirar, motxilla, ajuda};
+        botonsVerbs = new JButton[] {mirar, motxilla, objectius, ajuda};
 
         JPanel p = new JPanel();
         p.setLayout(new BoxLayout(p, BoxLayout.X_AXIS));
@@ -233,6 +236,8 @@ public class VistaGrafica implements Vista {
         p.add(mirar);
         p.add(Box.createHorizontalStrut(6));
         p.add(motxilla);
+        p.add(Box.createHorizontalStrut(6));
+        p.add(objectius);
         p.add(Box.createHorizontalStrut(6));
         p.add(ajuda);
         p.add(Box.createHorizontalStrut(10));
@@ -321,13 +326,14 @@ public class VistaGrafica implements Vista {
         // a les fosques no es veuen ni els elements, igual que diu el text
         List<Element> visibles = fosc ? new ArrayList<>() : z.getElements();
         panellImatge.posar(imatge, z.getNom(), joc.getRellotge().getHoraFormatada(),
-                joc.getRellotge().minutsRestants(), fosc, visibles);
+                joc.getRellotge().minutsRestants(), fosc, visibles, joc.objectiuActual());
         refrescarSortides(z);
     }
 
     // un boto per cada sortida visible, amb una fletxa segons la direccio
     private void refrescarSortides(Zona z) {
         panellSortides.removeAll();
+        String capAlBus = joc.direccioCapAlBus();
         boolean primera = true;
         for (Connexio c : z.getConnexions()) {
             if (!c.esVisible()) {
@@ -336,8 +342,13 @@ public class VistaGrafica implements Vista {
             if (!primera) {
                 panellSortides.add(Box.createHorizontalStrut(8));
             }
-            JButton b = new BotoPla(fletxa(c.getDireccio()) + "   " + c.getDesti().getNom(),
-                    BOTO, BOTO_SOBRE, TEXT);
+            // la sortida que porta cap al bus va destacada: la resta segueixen sent-hi
+            boolean tornada = capAlBus != null && capAlBus.equals(c.getDireccio());
+            String etiqueta = fletxa(c.getDireccio()) + "   " + c.getDesti().getNom()
+                            + (tornada ? "   ·   cap al bus" : "");
+            JButton b = tornada
+                    ? new BotoPla(etiqueta, ACCENT, ACCENT_SOBRE, FONS)
+                    : new BotoPla(etiqueta, BOTO, BOTO_SOBRE, TEXT);
             b.addActionListener(e -> enviar("ANAR " + c.getDireccio()));
             panellSortides.add(b);
             primera = false;
@@ -450,6 +461,7 @@ public class VistaGrafica implements Vista {
         private ImageIcon imatge;
         private String nomZona = "";
         private String hora = "";
+        private String objectiu = "";
         private int restants;
         private boolean fosc;
         private List<Element> elements = new ArrayList<>();
@@ -462,14 +474,27 @@ public class VistaGrafica implements Vista {
         }
 
         void posar(ImageIcon imatge, String nomZona, String hora, int restants, boolean fosc,
-                   List<Element> elements) {
+                   List<Element> elements, String objectiu) {
             this.imatge = imatge;
             this.nomZona = nomZona;
             this.hora = hora;
+            this.objectiu = objectiu == null ? "" : objectiu;
             this.restants = restants;
             this.fosc = fosc;
             this.elements = new ArrayList<>(elements);
             repaint();
+        }
+
+        // retalla el text si no cap al rotul
+        private String escurcar(String s, FontMetrics fm, int maxim) {
+            if (fm.stringWidth(s) <= maxim) {
+                return s;
+            }
+            String tallat = s;
+            while (tallat.length() > 4 && fm.stringWidth(tallat + "...") > maxim) {
+                tallat = tallat.substring(0, tallat.length() - 1);
+            }
+            return tallat + "...";
         }
 
         // quin element hi ha en aquest punt, o null
@@ -566,10 +591,15 @@ public class VistaGrafica implements Vista {
             Font petita = new Font(LLETRA, Font.PLAIN, 12);
             FontMetrics mg = g2.getFontMetrics(gran);
             FontMetrics mp = g2.getFontMetrics(petita);
-            int ample = Math.max(mg.stringWidth(nomZona), mp.stringWidth(detall)) + 28;
+            // la fita del moment va al rotul: si nomes sortis al text, el scroll se l'emporta
+            String marca = objectiu.isEmpty() ? "" : escurcar("→   " + objectiu, mp, 420);
+
+            int ample = Math.max(mg.stringWidth(nomZona), mp.stringWidth(detall));
+            ample = Math.max(ample, mp.stringWidth(marca)) + 28;
+            int alt = marca.isEmpty() ? 52 : 76;
 
             g2.setColor(new Color(15, 16, 22, 185));
-            g2.fillRoundRect(14, 14, ample, 52, 14, 14);
+            g2.fillRoundRect(14, 14, ample, alt, 14, 14);
             g2.setFont(gran);
             g2.setColor(TEXT);
             g2.drawString(nomZona, 28, 36);
@@ -577,6 +607,10 @@ public class VistaGrafica implements Vista {
             // quan queda poc temps l'hora es posa vermella
             g2.setColor(restants <= 20 ? ALERTA : SUAU);
             g2.drawString(detall, 28, 56);
+            if (!marca.isEmpty()) {
+                g2.setColor(ACCENT);
+                g2.drawString(marca, 28, 76);
+            }
             g2.dispose();
         }
     }

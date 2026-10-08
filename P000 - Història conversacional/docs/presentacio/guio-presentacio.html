@@ -205,7 +205,7 @@ h3.sub span { font-family: var(--mono); color: var(--ambre); letter-spacing: 0; 
   <div class="previ">
     <h2>Abans de començar</h2>
     <ol>
-      <li>Joc obert al Camp Base i diagrama obert al darrere, <strong>col·locats abans d'entrar a l'aula</strong>.</li>
+      <li>Joc obert al Camp Base i <code class="ordre">presentacio.pptx</code> en mode presentador, <strong>col·locats abans d'entrar a l'aula</strong>.</li>
       <li>Engega el joc des de la carpeta <code class="ordre">P000 - Història conversacional</code>, o les imatges no carreguen.</li>
       <li>Prova-ho <strong>a l'ordinador i al projector de debò</strong>, no només al teu.</li>
       <li>La xuleta d'ordres, impresa al costat del teclat.</li>
@@ -229,8 +229,8 @@ h3.sub span { font-family: var(--mono); color: var(--ambre); letter-spacing: 0; 
     </div>
   </section>
 
-  <section class="bloc" data-inici="45" data-fi="105">
-    <div><div class="codi">0:45</div><div class="durada">1 min</div></div>
+  <section class="bloc" data-inici="45" data-fi="90">
+    <div><div class="codi">0:45</div><div class="durada">45 s</div></div>
     <div class="cos">
       <h2 class="titol">Què demanava l'enunciat</h2>
       <div class="pantalla"><b>A la pantalla</b>Segueixes al joc.</div>
@@ -245,11 +245,11 @@ h3.sub span { font-family: var(--mono); color: var(--ambre); letter-spacing: 0; 
     </div>
   </section>
 
-  <section class="bloc" data-inici="105" data-fi="165">
-    <div><div class="codi">1:45</div><div class="durada">1 min</div></div>
+  <section class="bloc" data-inici="90" data-fi="150">
+    <div><div class="codi">1:30</div><div class="durada">1 min</div></div>
     <div class="cos">
       <h2 class="titol">El mapa</h2>
-      <div class="pantalla"><b>A la pantalla</b>Diagrama, pàgina 2 — Mapa de zones. <strong>Primer canvi de finestra.</strong></div>
+      <div class="pantalla"><b>A la pantalla</b>Diapositiva 3 — el mapa de zones.</div>
       <div class="diu">
         <p>Aquest és el mapa. Deu zones, i no totes tenen les mateixes sortides: el Camp Base en té una i la Cova Fosca en té quatre. Les línies vermelles són passos condicionats.</p>
       </div>
@@ -261,43 +261,11 @@ h3.sub span { font-family: var(--mono); color: var(--ambre); letter-spacing: 0; 
     </div>
   </section>
 
-  <section class="bloc" data-inici="165" data-fi="315">
-    <div><div class="codi">2:45</div><div class="durada">2 min 30</div></div>
-    <div class="cos">
-      <h2 class="titol">Arquitectura</h2>
-      <div class="pantalla"><b>A la pantalla</b>Diagrama, pàgina 1. Fes zoom a cada zona de la qual parlis.</div>
-      <div class="diu">
-        <p>Trenta-sis classes repartides en quatre paquets: <em>model</em> és l'estat del món, <em>control</em> executa les ordres, <em>vista</em> ho ensenya i <em>excepcions</em> són els errors propis. Vull destacar-ne tres decisions.</p>
-      </div>
-
-      <h3 class="sub"><span>3:05</span> Decisió 1 · la jerarquia</h3>
-      <div class="diu">
-        <p>Tot amb què es pot interactuar hereta d'<em>Element</em>, que és abstracta: d'ella pengen Objecte, Contenidor i Personatge.</p>
-        <p>A sobre hi ha dues interfícies: <em>Encenible</em>, que implementa la llanterna, i <em>Usable</em>, que implementen els objectes. Van ser interfícies i no classes perquè una llanterna ja és un objecte i no pot heretar dues vegades. És el cas típic on calen interfícies.</p>
-        <p>Gràcies a això, quan el jugador escriu una ordre el motor no pregunta de quin tipus és cada cosa: li demana a l'element que reaccioni, i cada classe sap què fer.</p>
-      </div>
-
-      <h3 class="sub"><span>3:55</span> Decisió 2 · una sola porta d'entrada</h3>
-      <div class="diu">
-        <p>Els verbs són un <em>enum</em>, no textos solts: el switch del motor treballa sobre casos tancats i no hi ha cap verb escrit a mà enmig del codi.</p>
-        <p>I tot entra per un sol lloc. A la finestra hi ha un mètode <em>enviar</em> que és l'únic camí: el camp de text, els botons de dalt, els botons de sortida i el menú dels dibuixos hi acaben tots. Tot es converteix en text i passa per l'analitzador.</p>
-        <p>Per això els botons de sortida no estan escrits a mà: es generen recorrent les connexions visibles de la zona, amb la fletxa segons la direcció. <em>Si canvio el mapa, els botons canvien sols.</em></p>
-      </div>
-
-      <h3 class="sub"><span>4:35</span> Decisió 3 · les excepcions</h3>
-      <div class="diu">
-        <p>La tercera respon a una competència que demanava l'enunciat: la gestió d'errors amb excepcions.</p>
-        <p>Hi ha una classe <em>JocException</em> abstracta i quatre filles. Cadascuna guarda dos missatges: el tècnic, per depurar, i el que veu el jugador. Al jugador no li dius «element inexistent», li dius «aquí no veig cap navalla».</p>
-        <p>I com que totes hereten de la mateixa, el bucle del joc les caça <em>totes amb un sol catch</em>.</p>
-      </div>
-    </div>
-  </section>
-
-  <section class="bloc" data-inici="315" data-fi="450">
-    <div><div class="codi">5:15</div><div class="durada">2 min 15</div></div>
+  <section class="bloc" data-inici="150" data-fi="285">
+    <div><div class="codi">2:30</div><div class="durada">2 min 15</div></div>
     <div class="cos">
       <h2 class="titol">Demostració</h2>
-      <div class="pantalla"><b>A la pantalla</b>Tornes al joc. <strong>Segon canvi de finestra, i l'últim.</strong></div>
+      <div class="pantalla"><b>A la pantalla</b>Vas al joc. <strong>Primer canvi de finestra.</strong> En tornar, el segon i últim.</div>
       <div class="diu"><p>Us ensenyo com funciona per dins.</p></div>
       <div class="passos">
         <div class="pas"><code>agafar cantimplora</code><span>«Agafar objectes. Fixeu-vos que desapareix del dibuix de sota: allà hi ha el que hi ha a la zona.»</span></div>
@@ -318,6 +286,38 @@ h3.sub span { font-family: var(--mono); color: var(--ambre); letter-spacing: 0; 
         <code>usar la poma amb el senglar</code>
         <p>El següent que escrius, sense excepcions. Reaccionant se sobreviu sempre.</p>
         <p>I explica-ho com si estigués previst: «el senglar es mou sol cada dos torns; si te'l trobes et dona un torn per reaccionar». Queda millor que la ruta neta.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="bloc" data-inici="285" data-fi="450">
+    <div><div class="codi">4:45</div><div class="durada">2 min 45</div></div>
+    <div class="cos">
+      <h2 class="titol">Arquitectura</h2>
+      <div class="pantalla"><b>A la pantalla</b>Diapositives 5 a 8 — arquitectura, jerarquia, recorregut d'una ordre i excepcions.</div>
+      <div class="diu">
+        <p>Trenta-sis classes repartides en quatre paquets: <em>model</em> és l'estat del món, <em>control</em> executa les ordres, <em>vista</em> ho ensenya i <em>excepcions</em> són els errors propis. Vull destacar-ne tres decisions.</p>
+      </div>
+
+      <h3 class="sub"><span>5:05</span> Decisió 1 · la jerarquia</h3>
+      <div class="diu">
+        <p>Tot amb què es pot interactuar hereta d'<em>Element</em>, que és abstracta: d'ella pengen Objecte, Contenidor i Personatge.</p>
+        <p>A sobre hi ha dues interfícies: <em>Encenible</em>, que implementa la llanterna, i <em>Usable</em>, que implementen els objectes. Van ser interfícies i no classes perquè una llanterna ja és un objecte i no pot heretar dues vegades. És el cas típic on calen interfícies.</p>
+        <p>Gràcies a això, quan el jugador escriu una ordre el motor no pregunta de quin tipus és cada cosa: li demana a l'element que reaccioni, i cada classe sap què fer.</p>
+      </div>
+
+      <h3 class="sub"><span>5:55</span> Decisió 2 · una sola porta d'entrada</h3>
+      <div class="diu">
+        <p>Els verbs són un <em>enum</em>, no textos solts: el switch del motor treballa sobre casos tancats i no hi ha cap verb escrit a mà enmig del codi.</p>
+        <p>I tot entra per un sol lloc. A la finestra hi ha un mètode <em>enviar</em> que és l'únic camí: el camp de text, els botons de dalt, els botons de sortida i el menú dels dibuixos hi acaben tots. Tot es converteix en text i passa per l'analitzador.</p>
+        <p>Per això els botons de sortida no estan escrits a mà: es generen recorrent les connexions visibles de la zona, amb la fletxa segons la direcció. <em>Si canvio el mapa, els botons canvien sols.</em></p>
+      </div>
+
+      <h3 class="sub"><span>6:35</span> Decisió 3 · les excepcions</h3>
+      <div class="diu">
+        <p>La tercera respon a una competència que demanava l'enunciat: la gestió d'errors amb excepcions.</p>
+        <p>Hi ha una classe <em>JocException</em> abstracta i quatre filles. Cadascuna guarda dos missatges: el tècnic, per depurar, i el que veu el jugador. Al jugador no li dius «element inexistent», li dius «aquí no veig cap navalla».</p>
+        <p>I com que totes hereten de la mateixa, el bucle del joc les caça <em>totes amb un sol catch</em>.</p>
       </div>
     </div>
   </section>
@@ -375,7 +375,7 @@ usar la poma amb el senglar</p>
     </div>
   </div>
 
-  <p class="control">Marques de control: <b>2:45</b> arquitectura · <b>5:15</b> demostració · <b>7:30</b> git. Si a les 5:15 no has arribat a la demostració, salta't la decisió 2 i continua.</p>
+  <p class="control">Marques de control: <b>2:30</b> entres a la demostració · <b>4:45</b> en surts · <b>7:30</b> testing · <b>8:15</b> tanques. Si vas tard, la que es resumeix en dues frases és la decisió 2. El text sencer i les preguntes amb resposta són a <b>guio-complet.md</b>.</p>
 
 </div>
 

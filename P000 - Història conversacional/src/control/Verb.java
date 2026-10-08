@@ -3,7 +3,7 @@ package control;
 public enum Verb {
 
     ANAR, AGAFAR, DEIXAR, USAR, OBRIR, TANCAR, ENCENDRE, APAGAR, PARLAR,
-    FER_FOTO, INVENTARI, MIRAR;
+    FER_FOTO, INVENTARI, MIRAR, OBJECTIUS;
 
     public static Verb desDeText(String s) {
         if (s == null) {
